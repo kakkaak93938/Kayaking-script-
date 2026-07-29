@@ -1156,42 +1156,65 @@ do
 							end
 						end
 						local function u97()
-							local Character = u89.Character
+    local Character = u89.Character
+    if not Character then return end
+    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+    if not HumanoidRootPart then return end
 
-							if Character then
-								local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+    -- 1️⃣ تحديث الهدف فوراً (لحل مشكلة الطلقة الأولى)
+    local freshTarget = u86()
+    if freshTarget then
+        u82 = freshTarget
+    end
 
-								if HumanoidRootPart then
-									local v499 = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+    -- 2️⃣ بحث احتياطي (لو ما لقى هدف)
+    if not u82 then
+        local closest, minDist = nil, math.huge
+        for _, player in ipairs(u94:GetPlayers()) do
+            if player ~= u92 and player.Character then
+                local root = player.Character:FindFirstChild("HumanoidRootPart")
+                local hum = player.Character:FindFirstChildOfClass("Humanoid")
+                if root and hum and hum.Health > 0 then
+                    local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+                    if dist < minDist then
+                        minDist = dist
+                        closest = player.Character
+                    end
+                end
+            end
+        end
+        if closest then u82 = closest end
+    end
 
-									if v499 then
-										if u82 then
-											if Character ~= v499.Parent then
-												Character.Humanoid:EquipTool(v499)
-												task.wait(0)
-											end
+    -- 3️⃣ تجهيز السلاح
+    local v499 = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+    if not v499 then
+        u90:Notify({Title = "RuzHub", Content = "No gun!", Duration = 1})
+        return
+    end
 
-											local CFramePosition = u91.CFrame.Position
-											local v501 = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
-											local cFrame = CFrame.new(v501, CFramePosition)
-											local _pcall = pcall
-											local u504 = v499
+    if not u82 then
+        u90:Notify({Title = "RuzHub", Content = "No target!", Duration = 1})
+        return
+    end
 
-											pcall(function()
-												local Shoot = u504:WaitForChild("Shoot")
-												local v876 = (function(...)
-													local t6 = { ... }
+    if Character ~= v499.Parent then
+        Character.Humanoid:EquipTool(v499)
+        task.wait(0.03)
+    end
 
-													t6.n = select("#", ...)
-
-													return t6
-												end)(CFrame.new(CFramePosition))
-
-												Shoot:FireServer(cFrame, unpack(v876, 1, v876.n))
-											end)
-
-											return
-										end
+    -- 4️⃣ استخدم الكرة المتوقعة (u91) للتصويب الدقيق
+    if not u91 then return end
+    local CFramePosition = u91.CFrame.Position
+    local startPos = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
+    local cFrame = CFrame.new(startPos, CFramePosition)
+    
+    pcall(function()
+        local Shoot = v499:WaitForChild("Shoot")
+        task.wait(0.01)
+        Shoot:FireServer(cFrame, CFrame.new(CFramePosition))
+    end)
+						end
 
 										u90:Notify({
 											Title = "RuzHub",
