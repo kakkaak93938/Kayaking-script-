@@ -1155,66 +1155,94 @@ do
 								return
 							end
 						end
+						
+						-- ===== SHADOW GUN FIX V2 – الرصاص المطور (مع تحديث الهدف الفوري) =====
 						local function u97()
 							local Character = u89.Character
+							if not Character then return end
+							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							if not HumanoidRootPart then return end
 
-							if Character then
-								local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							-- 1️⃣ تحديث الهدف فوراً (لحل مشكلة الطلقة الأولى)
+							local freshTarget = u86()
+							if freshTarget then
+								u82 = freshTarget
+							end
 
-								if HumanoidRootPart then
-									local v499 = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
-
-									if v499 then
-										if u82 then
-											if Character ~= v499.Parent then
-												Character.Humanoid:EquipTool(v499)
-												task.wait(0)
+							-- 2️⃣ بحث احتياطي (لو ما لقى هدف)
+							if not u82 then
+								local closest, minDist = nil, math.huge
+								for _, player in ipairs(u94:GetPlayers()) do
+									if player ~= u92 and player.Character then
+										local root = player.Character:FindFirstChild("HumanoidRootPart")
+										local hum = player.Character:FindFirstChildOfClass("Humanoid")
+										if root and hum and hum.Health > 0 then
+											local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+											if dist < minDist then
+												minDist = dist
+												closest = player.Character
 											end
-
-											local CFramePosition = u91.CFrame.Position
-											local v501 = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
-											local cFrame = CFrame.new(v501, CFramePosition)
-											local _pcall = pcall
-											local u504 = v499
-
-											pcall(function()
-												local Shoot = u504:WaitForChild("Shoot")
-												local v876 = (function(...)
-													local t6 = { ... }
-
-													t6.n = select("#", ...)
-
-													return t6
-												end)(CFrame.new(CFramePosition))
-
-												Shoot:FireServer(cFrame, unpack(v876, 1, v876.n))
-											end)
-
-											return
 										end
-
-										u90:Notify({
-											Title = "RuzHub",
-											Content = tostring("No target found."),
-											Duration = 3,
-											Icon = "bell",
-										})
-
-										return
 									end
-
-									u90:Notify({
-										Title = "RuzHub",
-										Content = tostring("No gun in inventory!"),
-										Duration = 3,
-										Icon = "bell",
-									})
-
-									return
 								end
+								if closest then u82 = closest end
+							end
 
+							-- 3️⃣ تجهيز السلاح
+							local v499 = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+							if not v499 then
+								u90:Notify({Title = "RuzHub", Content = "No gun!", Duration = 1})
 								return
 							end
+
+							if not u82 then
+								u90:Notify({Title = "RuzHub", Content = "No target!", Duration = 1})
+								return
+							end
+
+							if Character ~= v499.Parent then
+								Character.Humanoid:EquipTool(v499)
+								task.wait(0.03)
+							end
+
+							-- 4️⃣ استخراج الهدف
+							local targetRoot = u82:FindFirstChild("HumanoidRootPart")
+							if not targetRoot then return end
+							local targetPart = u82:FindFirstChild("UpperTorso") or (u82:FindFirstChild("Torso") or targetRoot)
+
+							-- 5️⃣ حساب البنق الحقيقي
+							local ping = 0
+							if u13 then
+								local ok, res = pcall(function() return u89:GetNetworkPing() end)
+								if ok then ping = res or 0 end
+							end
+
+							-- 6️⃣ معادلة الرصاص المتقدمة
+							local targetVel = targetRoot.AssemblyLinearVelocity
+							local distance = (targetPart.Position - HumanoidRootPart.Position).Magnitude
+
+							local bulletSpeed = 1200
+							local travelTime = math.max(distance / bulletSpeed, 0.015)
+							local totalTime = travelTime + (ping * 1.8)
+
+							local predictedPos = targetPart.Position + Vector3.new(targetVel.X, 0, targetVel.Z) * totalTime
+							if targetRoot.Velocity.Y > 3 then
+								predictedPos = predictedPos + Vector3.new(0, -0.9 * totalTime, 0)
+							end
+
+							-- 7️⃣ تحديث كرة التوقع (عشان تشوفها في اللعبة)
+							if u91 then
+								u91.CFrame = CFrame.new(predictedPos)
+							end
+
+							-- 8️⃣ إرسال الطلقة (مع تأخير بسيط للطلقة الأولى)
+							local startPos = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
+							local cFrame = CFrame.new(startPos, predictedPos)
+							pcall(function()
+								local Shoot = v499:WaitForChild("Shoot")
+								task.wait(0.01)
+								Shoot:FireServer(cFrame, CFrame.new(predictedPos))
+							end)
 						end
 
 						function u98()
