@@ -984,223 +984,276 @@ do
 						local u95 = LocalPlayer
 
 						-- ========================================================== --
-						-- 🎯 FINAL AIM ENGINE (المصحح بالكامل)                       --
+						-- 🎯 FINAL AIM ENGINE - FIXED (مسافات بعيدة + جاذبية حقيقية) --
 						-- ========================================================== --
 
-						-- 🔫 دالة الرصاص (Hitscan - بدون زمن طيران)
+						-- 🔫 دالة الرصاص (معادلة فيزيائية كاملة)
 						local function u97()
-						    local Character = u89.Character
-						    if not Character then return end
-						    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-						    if not HumanoidRootPart then return end
+							local Character = u89.Character
+							if not Character then return end
+							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							if not HumanoidRootPart then return end
 
-						    -- 1. البحث عن المجرم أولاً
-						    local targetChar = nil
-						    for _, player in ipairs(u94:GetPlayers()) do
-						        if player ~= u92 and player.Character then
-						            local role = player:FindFirstChild("role") or player:FindFirstChild("PlayerRole")
-						            if role and (role.Value == "Murderer") then
-						                targetChar = player.Character
-						                break
-						            end
-						        end
-						    end
-						    if not targetChar then
-						        local closest, minDist = nil, math.huge
-						        for _, player in ipairs(u94:GetPlayers()) do
-						            if player ~= u92 and player.Character then
-						                local root = player.Character:FindFirstChild("HumanoidRootPart")
-						                local hum = player.Character:FindFirstChildOfClass("Humanoid")
-						                if root and hum and hum.Health > 0 then
-						                    local dist = (root.Position - HumanoidRootPart.Position).Magnitude
-						                    if dist < minDist then
-						                        minDist = dist
-						                        closest = player.Character
-						                    end
-						                end
-						            end
-						        end
-						        targetChar = closest
-						    end
-						    if not targetChar then return end
-						    u82 = targetChar
+							-- 1. هدف أولوية (Murderer)
+							local targetChar = nil
+							for _, player in ipairs(u94:GetPlayers()) do
+								if player ~= u92 and player.Character then
+									local role = player:FindFirstChild("role") or player:FindFirstChild("PlayerRole")
+									if role and (role.Value == "Murderer") then
+										targetChar = player.Character
+										break
+									end
+								end
+							end
+							if not targetChar then
+								local closest, minDist = nil, math.huge
+								for _, player in ipairs(u94:GetPlayers()) do
+									if player ~= u92 and player.Character then
+										local root = player.Character:FindFirstChild("HumanoidRootPart")
+										local hum = player.Character:FindFirstChildOfClass("Humanoid")
+										if root and hum and hum.Health > 0 then
+											local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+											if dist < minDist then
+												minDist = dist
+												closest = player.Character
+											end
+										end
+									end
+								end
+								targetChar = closest
+							end
+							if not targetChar then return end
+							u82 = targetChar
 
-						    -- 2. تجهيز السلاح
-						    local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
-						    if not gun then return end
-						    if Character ~= gun.Parent then
-						        Character.Humanoid:EquipTool(gun)
-						        task.wait(0.05)
-						    end
+							-- 2. السلاح
+							local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+							if not gun then return end
+							if Character ~= gun.Parent then
+								Character.Humanoid:EquipTool(gun)
+								task.wait(0.05)
+							end
 
-						    -- 3. بيانات الهدف
-						    local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-						    local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
-						    if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
+							local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+							local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
+							if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
 
-						    -- 4. البنق الفعلي (من Stats)
-						    local ping = 0.06
-						    local stats = game:GetService("Stats")
-						    local network = stats:FindFirstChild("Network")
-						    if network then
-						        local item = network:FindFirstChild("ServerStatsItem")
-						        if item then
-						            local pingItem = item:FindFirstChild("Data Ping")
-						            if pingItem then
-						                ping = pingItem:GetValue() / 1000
-						            end
-						        end
-						    end
+							-- 3. Ping حقيقي (من Stats)
+							local ping = 0.06
+							local stats = game:GetService("Stats")
+							local network = stats:FindFirstChild("Network")
+							if network then
+								local item = network:FindFirstChild("ServerStatsItem")
+								if item then
+									local pingItem = item:FindFirstChild("Data Ping")
+									if pingItem then
+										ping = pingItem:GetValue() / 1000
+									end
+								end
+							end
 
-						    -- 5. 🔥 معادلة الرصاص (بدون travelTime، لأنها لحظية)
-						    local totalTime = ping * 1.1  -- تعويض البنق فقط
-						    local targetVel = targetRoot.AssemblyLinearVelocity
-						    local moveDir = targetHum.MoveDirection
+							-- 4. سرعة الهدف
+							local targetVel = targetRoot.AssemblyLinearVelocity
+							local moveDir = targetHum.MoveDirection
+							local walkSpeed = targetHum.WalkSpeed
+							if targetVel.Magnitude < 0.1 and moveDir.Magnitude > 0 then
+								targetVel = moveDir * walkSpeed
+							end
 
-						    if targetVel.Magnitude < 0.1 and moveDir.Magnitude > 0 then
-						        targetVel = moveDir * targetHum.WalkSpeed
-						    end
+							-- 5. المسافة
+							local distance = (targetRoot.Position - HumanoidRootPart.Position).Magnitude
 
-						    local targetPos = targetRoot.Position + targetVel * totalTime
+							-- 6. سرعة الرصاصة الفعلية (280 studs/sec)
+							local bulletSpeed = 280
+							local travelTime = distance / bulletSpeed
+							local totalTime = travelTime + (ping * 1.15)
 
-						    -- 6. الجاذبية (إذا كان الهدف في الهواء)
-						    local workspace = game:GetService("Workspace")
-						    if targetHum.FloorMaterial == Enum.Material.Air then
-						        targetPos = targetPos + 0.5 * Vector3.new(0, -workspace.Gravity, 0) * totalTime ^ 2
-						    end
-						    if targetPos.Y < targetRoot.Position.Y - 1 and targetHum.FloorMaterial ~= Enum.Material.Air then
-						        targetPos = Vector3.new(targetPos.X, targetRoot.Position.Y, targetPos.Z)
-						    end
+							-- 7. الموقع المتوقع (بدون جاذبية)
+							local targetPos = targetRoot.Position + targetVel * totalTime
 
-						    -- 7. البحث عن Remote الإطلاق
-						    local shootRemote = gun:FindFirstChild("Shoot")
-						    if not shootRemote or not shootRemote:IsA("RemoteEvent") then
-						        local events = gun:FindFirstChild("Events") or gun:FindFirstChild("Remotes")
-						        if events then
-						            shootRemote = events:FindFirstChild("Shoot") or events:FindFirstChild("Fire")
-						        end
-						    end
-						    if not shootRemote or not shootRemote:IsA("RemoteEvent") then
-						        for _, child in ipairs(gun:GetDescendants()) do
-						            if child:IsA("RemoteEvent") and (child.Name:lower():find("shoot") or child.Name:lower():find("fire")) then
-						                shootRemote = child
-						                break
-						            end
-						        end
-						    end
-						    if not shootRemote then return end
+							-- 8. الجاذبية الصحيحة (معادلة زاوية الإطلاق)
+							local workspace = game:GetService("Workspace")
+							local gravity = workspace.Gravity
+							local gunY = HumanoidRootPart.Position.Y + 2.1
+							local heightDiff = gunY - targetRoot.Position.Y
+							local v2 = bulletSpeed * bulletSpeed
+							local gd = gravity * distance * distance
+							local rootPart = v2 - gravity * (gd + 2 * heightDiff * v2)
 
-						    -- 8. الإطلاق
-						    local startPos = HumanoidRootPart.Position + Vector3.new(0, 1.8, 0)
-						    local cFrame = CFrame.new(startPos, targetPos)
-						    pcall(function()
-						        shootRemote:FireServer(cFrame, CFrame.new(targetPos))
-						    end)
+							if rootPart < 0 then
+								targetPos = targetRoot.Position + Vector3.new(0, 5, 0)
+							else
+								rootPart = math.sqrt(rootPart)
+								local angle = math.atan2(v2 - rootPart, gravity * distance)
+								local xzDir = Vector3.new(
+									targetRoot.Position.X - HumanoidRootPart.Position.X,
+									0,
+									targetRoot.Position.Z - HumanoidRootPart.Position.Z
+								).Unit
+								targetPos = HumanoidRootPart.Position
+									+ xzDir * (bulletSpeed * travelTime)
+									+ Vector3.new(
+										0,
+										bulletSpeed * math.sin(angle) * totalTime - 0.5 * gravity * totalTime * totalTime,
+										0
+									)
+							end
+
+							if targetPos.Y < targetRoot.Position.Y - 3 and targetHum.FloorMaterial ~= Enum.Material.Air then
+								targetPos = Vector3.new(targetPos.X, targetRoot.Position.Y, targetPos.Z)
+							end
+
+							-- 9. Remote الإطلاق
+							local shootRemote = gun:FindFirstChild("Shoot")
+							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
+								local events = gun:FindFirstChild("Events") or gun:FindFirstChild("Remotes")
+								if events then
+									shootRemote = events:FindFirstChild("Shoot") or events:FindFirstChild("Fire")
+								end
+							end
+							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
+								for _, child in ipairs(gun:GetDescendants()) do
+									if child:IsA("RemoteEvent") and (child.Name:lower():find("shoot") or child.Name:lower():find("fire")) then
+										shootRemote = child
+										break
+									end
+								end
+							end
+							if not shootRemote then return end
+
+							-- 10. الإطلاق
+							local startPos = HumanoidRootPart.Position + Vector3.new(0, 2.1, 0)
+							local cFrame = CFrame.new(startPos, targetPos)
+							pcall(function()
+								shootRemote:FireServer(cFrame, CFrame.new(targetPos))
+							end)
 						end
 
-						-- 🗡️ دالة السكين (مقذوف - مع زمن طيران)
+						-- 🗡️ دالة السكين (نفس المنطق مع سرعة 120)
 						local function u96()
-						    local Character = u92.Character
-						    if not Character then return end
-						    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-						    if not HumanoidRootPart then return end
+							local Character = u92.Character
+							if not Character then return end
+							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							if not HumanoidRootPart then return end
 
-						    -- 1. البحث عن الهدف
-						    local target = u82
-						    if not target then
-						        local closest, minDist = nil, math.huge
-						        for _, player in ipairs(u94:GetPlayers()) do
-						            if player ~= u92 and player.Character then
-						                local root = player.Character:FindFirstChild("HumanoidRootPart")
-						                local hum = player.Character:FindFirstChildOfClass("Humanoid")
-						                if root and hum and hum.Health > 0 then
-						                    local dist = (root.Position - HumanoidRootPart.Position).Magnitude
-						                    if dist < minDist then
-						                        minDist = dist
-						                        closest = player.Character
-						                    end
-						                end
-						            end
-						        end
-						        target = closest
-						    end
-						    if not target then return end
-						    u82 = target
+							-- 1. الهدف
+							local target = u82
+							if not target then
+								local closest, minDist = nil, math.huge
+								for _, player in ipairs(u94:GetPlayers()) do
+									if player ~= u92 and player.Character then
+										local root = player.Character:FindFirstChild("HumanoidRootPart")
+										local hum = player.Character:FindFirstChildOfClass("Humanoid")
+										if root and hum and hum.Health > 0 then
+											local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+											if dist < minDist then
+												minDist = dist
+												closest = player.Character
+											end
+										end
+									end
+								end
+								target = closest
+							end
+							if not target then return end
+							u82 = target
 
-						    -- 2. السكين
-						    local knife = u92.Backpack:FindFirstChild("Knife") or Character:FindFirstChild("Knife")
-						    if not knife then return end
+							-- 2. السكين
+							local knife = u92.Backpack:FindFirstChild("Knife") or Character:FindFirstChild("Knife")
+							if not knife then return end
 
-						    if Character ~= knife.Parent then
-						        Character.Humanoid:EquipTool(knife)
-						        task.wait(0.05)
-						    end
+							if Character ~= knife.Parent then
+								Character.Humanoid:EquipTool(knife)
+								task.wait(0.05)
+							end
 
-						    -- 3. بيانات الهدف
-						    local targetRoot = target:FindFirstChild("HumanoidRootPart")
-						    local targetHum = target:FindFirstChildOfClass("Humanoid")
-						    if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
+							local targetRoot = target:FindFirstChild("HumanoidRootPart")
+							local targetHum = target:FindFirstChildOfClass("Humanoid")
+							if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
 
-						    -- 4. البنق الفعلي
-						    local ping = 0.06
-						    local stats = game:GetService("Stats")
-						    local network = stats:FindFirstChild("Network")
-						    if network then
-						        local item = network:FindFirstChild("ServerStatsItem")
-						        if item then
-						            local pingItem = item:FindFirstChild("Data Ping")
-						            if pingItem then
-						                ping = pingItem:GetValue() / 1000
-						            end
-						        end
-						    end
+							-- 3. Ping حقيقي
+							local ping = 0.06
+							local stats = game:GetService("Stats")
+							local network = stats:FindFirstChild("Network")
+							if network then
+								local item = network:FindFirstChild("ServerStatsItem")
+								if item then
+									local pingItem = item:FindFirstChild("Data Ping")
+									if pingItem then
+										ping = pingItem:GetValue() / 1000
+									end
+								end
+							end
 
-						    -- 5. 🚀 معادلة السكين (مع travelTime لأنها مقذوف)
-						    local distance = (targetRoot.Position - HumanoidRootPart.Position).Magnitude
-						    local knifeSpeed = 120  -- سرعة السكين الفعلية
-						    local travelTime = distance / knifeSpeed
-						    local totalTime = travelTime + (ping * 1.1)
+							-- 4. سرعة الهدف
+							local targetVel = targetRoot.AssemblyLinearVelocity
+							local moveDir = targetHum.MoveDirection
+							if targetVel.Magnitude < 0.1 and moveDir.Magnitude > 0 then
+								targetVel = moveDir * targetHum.WalkSpeed
+							end
 
-						    local targetVel = targetRoot.AssemblyLinearVelocity
-						    local moveDir = targetHum.MoveDirection
+							-- 5. المسافة وزمن الطيران (السكين أبطأ)
+							local distance = (targetRoot.Position - HumanoidRootPart.Position).Magnitude
+							local knifeSpeed = 120
+							local travelTime = distance / knifeSpeed
+							local totalTime = travelTime + (ping * 1.15)
 
-						    if targetVel.Magnitude < 0.1 and moveDir.Magnitude > 0 then
-						        targetVel = moveDir * targetHum.WalkSpeed
-						    end
+							-- 6. الموقع المتوقع
+							local targetPos = targetRoot.Position + targetVel * totalTime
 
-						    local targetPos = targetRoot.Position + targetVel * totalTime
+							-- 7. الجاذبية للسكين
+							local workspace = game:GetService("Workspace")
+							local gravity = workspace.Gravity
+							local gunY = HumanoidRootPart.Position.Y + 2.1
+							local heightDiff = gunY - targetRoot.Position.Y
+							local v2 = knifeSpeed * knifeSpeed
+							local gd = gravity * distance * distance
+							local rootPart = v2 - gravity * (gd + 2 * heightDiff * v2)
 
-						    -- 6. الجاذبية للسكين
-						    local workspace = game:GetService("Workspace")
-						    if targetHum.FloorMaterial == Enum.Material.Air then
-						        targetPos = targetPos + 0.5 * Vector3.new(0, -workspace.Gravity, 0) * totalTime ^ 2
-						    end
-						    if targetPos.Y < targetRoot.Position.Y - 1 and targetHum.FloorMaterial ~= Enum.Material.Air then
-						        targetPos = Vector3.new(targetPos.X, targetRoot.Position.Y, targetPos.Z)
-						    end
+							if rootPart < 0 then
+								targetPos = targetRoot.Position + Vector3.new(0, 5, 0)
+							else
+								rootPart = math.sqrt(rootPart)
+								local angle = math.atan2(v2 - rootPart, gravity * distance)
+								local xzDir = Vector3.new(
+									targetRoot.Position.X - HumanoidRootPart.Position.X,
+									0,
+									targetRoot.Position.Z - HumanoidRootPart.Position.Z
+								).Unit
+								targetPos = HumanoidRootPart.Position
+									+ xzDir * (knifeSpeed * travelTime)
+									+ Vector3.new(
+										0,
+										knifeSpeed * math.sin(angle) * totalTime - 0.5 * gravity * totalTime * totalTime,
+										0
+									)
+							end
 
-						    -- 7. Remote الرمي
-						    local throwRemote = nil
-						    local events = knife:FindFirstChild("Events") or knife:FindFirstChild("Remotes")
-						    if events then
-						        throwRemote = events:FindFirstChild("KnifeThrown") or events:FindFirstChild("Throw") or events:FindFirstChild("Fire")
-						    end
-						    if not throwRemote or not throwRemote:IsA("RemoteEvent") then
-						        for _, child in ipairs(knife:GetDescendants()) do
-						            if child:IsA("RemoteEvent") and (child.Name:lower():find("knife") or child.Name:lower():find("throw")) then
-						                throwRemote = child
-						                break
-						            end
-						        end
-						    end
-						    if not throwRemote then return end
+							if targetPos.Y < targetRoot.Position.Y - 3 and targetHum.FloorMaterial ~= Enum.Material.Air then
+								targetPos = Vector3.new(targetPos.X, targetRoot.Position.Y, targetPos.Z)
+							end
 
-						    -- 8. الرمي
-						    local startPos = HumanoidRootPart.Position + Vector3.new(0, 1.8, 0)
-						    local cFrame = CFrame.new(startPos, targetPos)
-						    pcall(function()
-						        throwRemote:FireServer(cFrame, CFrame.new(targetPos))
-						    end)
+							-- 8. Remote الرمي
+							local throwRemote = nil
+							local events = knife:FindFirstChild("Events") or knife:FindFirstChild("Remotes")
+							if events then
+								throwRemote = events:FindFirstChild("KnifeThrown") or events:FindFirstChild("Throw") or events:FindFirstChild("Fire")
+							end
+							if not throwRemote or not throwRemote:IsA("RemoteEvent") then
+								for _, child in ipairs(knife:GetDescendants()) do
+									if child:IsA("RemoteEvent") and (child.Name:lower():find("knife") or child.Name:lower():find("throw")) then
+										throwRemote = child
+										break
+									end
+								end
+							end
+							if not throwRemote then return end
+
+							-- 9. الرمي
+							local startPos = HumanoidRootPart.Position + Vector3.new(0, 2.1, 0)
+							local cFrame = CFrame.new(startPos, targetPos)
+							pcall(function()
+								throwRemote:FireServer(cFrame, CFrame.new(targetPos))
+							end)
 						end
 
 						function u98()
