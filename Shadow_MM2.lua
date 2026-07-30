@@ -984,7 +984,7 @@ do
 						local u95 = LocalPlayer
 
 						-- ========================================================== --
-						-- ♻️ ULTIMATE ENGINE: محرك Vision Hub الأصلي للرصاص         --
+						-- 🚀 ULTIMATE AIM ENGINE (محسن بالكامل)                     --
 						-- ========================================================== --
 
 						local function u97()
@@ -993,6 +993,7 @@ do
 							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 							if not HumanoidRootPart then return end
 
+							-- 1. البحث عن المجرم (أولوية)
 							local targetChar = nil
 							for _, player in ipairs(u94:GetPlayers()) do
 								if player ~= u92 and player.Character then
@@ -1023,6 +1024,7 @@ do
 							if not targetChar then return end
 							u82 = targetChar
 
+							-- 2. تجهيز السلاح
 							local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
 							if not gun then return end
 							if Character ~= gun.Parent then
@@ -1030,11 +1032,13 @@ do
 								task.wait(0.05)
 							end
 
+							-- 3. استخراج بيانات الهدف
 							local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
 							local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
 							if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
 
-							local n4 = 0.06
+							-- 4. الحصول على البنق الفعلي (من Stats)
+							local ping = 0.06
 							local stats = game:GetService("Stats")
 							local network = stats:FindFirstChild("Network")
 							if network then
@@ -1042,30 +1046,37 @@ do
 								if item then
 									local pingItem = item:FindFirstChild("Data Ping")
 									if pingItem then
-										n4 = pingItem:GetValue() / 1000
+										ping = pingItem:GetValue() / 1000
 									end
 								end
 							end
 
-							local v725 = n4 + 0.04
-							local v726 = math.clamp(v725, 0, 1)
-							local Position = targetRoot.Position
-							local AssemblyLinearVelocity = targetRoot.AssemblyLinearVelocity
-							local MoveDirection = targetHum.MoveDirection
+							-- 5. حساب سرعة الهدف الفعلية
+							local targetVel = targetRoot.AssemblyLinearVelocity
+							local moveDir = targetHum.MoveDirection
+							local walkSpeed = targetHum.WalkSpeed
 
-							if AssemblyLinearVelocity.Magnitude < 0.1 and MoveDirection.Magnitude > 0 then
-								AssemblyLinearVelocity = MoveDirection * targetHum.WalkSpeed
+							if targetVel.Magnitude < 0.1 and moveDir.Magnitude > 0 then
+								targetVel = moveDir * walkSpeed
 							end
 
-							local targetPos = Position + AssemblyLinearVelocity * v726
+							-- 6. حساب المسافة وزمن وصول المقذوف
+							local distance = (targetRoot.Position - HumanoidRootPart.Position).Magnitude
+							local bulletSpeed = 200
+							local travelTime = distance / bulletSpeed
+							local totalTime = travelTime + (ping * 1.2)
+
+							-- 7. الموقع المتوقع (مع الجاذبية)
+							local targetPos = targetRoot.Position + targetVel * totalTime
 							local workspace = game:GetService("Workspace")
 							if targetHum.FloorMaterial == Enum.Material.Air then
-								targetPos = targetPos + 0.5 * Vector3.new(0, -workspace.Gravity, 0) * v726 ^ 2
+								targetPos = targetPos + 0.5 * Vector3.new(0, -workspace.Gravity, 0) * totalTime ^ 2
 							end
-							if targetPos.Y < Position.Y - 1 and targetHum.FloorMaterial ~= Enum.Material.Air then
-								targetPos = Vector3.new(targetPos.X, Position.Y, targetPos.Z)
+							if targetPos.Y < targetRoot.Position.Y - 1 and targetHum.FloorMaterial ~= Enum.Material.Air then
+								targetPos = Vector3.new(targetPos.X, targetRoot.Position.Y, targetPos.Z)
 							end
 
+							-- 8. البحث عن Remote الإطلاق
 							local shootRemote = gun:FindFirstChild("Shoot")
 							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
 								local events = gun:FindFirstChild("Events") or gun:FindFirstChild("Remotes")
@@ -1083,6 +1094,7 @@ do
 							end
 							if not shootRemote then return end
 
+							-- 9. إرسال الطلقة
 							local startPos = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
 							local cFrame = CFrame.new(startPos, targetPos)
 							pcall(function()
