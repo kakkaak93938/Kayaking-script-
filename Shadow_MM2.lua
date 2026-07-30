@@ -1734,97 +1734,79 @@ do
 			local u130 = Workspace
 
 			function t2.ShootMurderer()
-				if u129.Character and u129.RootPart and u129.Backpack then
-					local v731 = u129.Character and u129.Character:FindFirstChild("Gun") or u129.Backpack and u129.Backpack:FindFirstChild("Gun")
-
-					if v731 then
-						local v732 = u129.Prediction()
-
-						if v732 then
-							local v733 = u129.FindMurderer()
-
-							if v733 and v733.Character then
-								local raycastParams = RaycastParams.new()
-								local t13 = {}
-								local Character = u129.Character
-								local CurrentCamera = u130.CurrentCamera
-
-								t13[1] = Character
-								t13[2] = CurrentCamera
-								raycastParams.FilterDescendantsInstances = t13
-								raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-
-								local RootPartPosition = u129.RootPart.Position
-								local v739 = v732 - RootPartPosition
-
-								if v739.Magnitude ~= 0 then
-									local raycastResult = u130:Raycast(RootPartPosition, v739.Unit * (v739.Magnitude + 2), raycastParams)
-
-									if not raycastResult or not raycastResult.Instance or raycastResult.Instance:IsDescendantOf(v733.Character) then
-										if v731.Parent == u129.Backpack then
-											v731.Parent = u129.Character
-											task.wait()
-										end
-
-										local KnifeLocal = v731:FindFirstChild("KnifeLocal")
-										local Shoot = v731:FindFirstChild("Shoot")
-
-										if not KnifeLocal then
-											if Shoot and Shoot:IsA("RemoteEvent") then
-												local spawn = task.spawn
-												local u744 = v732
-
-												spawn(function()
-													pcall(function()
-														local cFrame = CFrame.lookAt(RootPartPosition, u744)
-														local v1368 = (function(...)
-															local t14 = { ... }
-
-															t14.n = select("#", ...)
-
-															return t14
-														end)(CFrame.new(u744))
-
-														Shoot:FireServer(cFrame, unpack(v1368, 1, v1368.n))
-													end)
-												end)
-											end
-										else
-											local CreateBeam = KnifeLocal:FindFirstChild("CreateBeam")
-											local v746 = CreateBeam and CreateBeam:FindFirstChild("RemoteFunction")
-
-											if v746 then
-												local spawn = task.spawn
-												local u748 = v746
-												local u749 = v732
-
-												spawn(function()
-													pcall(function()
-														u748:InvokeServer(1, u749, "AH2")
-													end)
-												end)
-											end
-										end
-
-										return true
-									end
-
-									return false
+	if u129.Character and u129.RootPart and u129.Backpack then
+		local v731 = u129.Character and u129.Character:FindFirstChild("Gun") or u129.Backpack and u129.Backpack:FindFirstChild("Gun")
+		if v731 then
+			local v732 = u129.Prediction()
+			if v732 then
+				local v733 = u129.FindMurderer()
+				if v733 and v733.Character then
+					local raycastParams = RaycastParams.new()
+					local t13 = {}
+					local Character = u129.Character
+					local CurrentCamera = u130.CurrentCamera
+					t13[1] = Character
+					t13[2] = CurrentCamera
+					raycastParams.FilterDescendantsInstances = t13
+					raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+					local RootPartPosition = u129.RootPart.Position
+					local v739 = v732 - RootPartPosition
+					if v739.Magnitude ~= 0 then
+						local raycastResult = u130:Raycast(RootPartPosition, v739.Unit * (v739.Magnitude + 2), raycastParams)
+						if not raycastResult or not raycastResult.Instance or raycastResult.Instance:IsDescendantOf(v733.Character) then
+							if v731.Parent == u129.Backpack then
+								v731.Parent = u129.Character
+								task.wait()
+							end
+							local KnifeLocal = v731:FindFirstChild("KnifeLocal")
+							local Shoot = v731:FindFirstChild("Shoot")
+							if not KnifeLocal then
+								-- ===== التصحيح هنا: الـ return true داخل شرط وجود Shoot =====
+								if Shoot and Shoot:IsA("RemoteEvent") then
+									local spawn = task.spawn
+									local u744 = v732
+									spawn(function()
+										pcall(function()
+											local cFrame = CFrame.lookAt(RootPartPosition, u744)
+											local v1368 = (function(...)
+												local t14 = { ... }
+												t14.n = select("#", ...)
+												return t14
+											end)(CFrame.new(u744))
+											Shoot:FireServer(cFrame, unpack(v1368, 1, v1368.n))
+										end)
+									end)
+									return true  -- ✅ نجح الإطلاق
 								end
-
+								return false  -- ❌ ما لقى Remote
+							else
+								local CreateBeam = KnifeLocal:FindFirstChild("CreateBeam")
+								local v746 = CreateBeam and CreateBeam:FindFirstChild("RemoteFunction")
+								if v746 then
+									local spawn = task.spawn
+									local u748 = v746
+									local u749 = v732
+									spawn(function()
+										pcall(function()
+											u748:InvokeServer(1, u749, "AH2")
+										end)
+									end)
+									return true
+								end
 								return false
 							end
-
-							return false
 						end
-
 						return false
 					end
-
 					return false
 				end
-
 				return false
+			end
+			return false
+		end
+		return false
+	end
+	return false
 			end
 			local u131 = nil
 
