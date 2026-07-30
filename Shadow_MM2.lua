@@ -704,7 +704,7 @@ do
 			local u85 = Players
 			local u86 = RunService
 
-						function t2.ToggleAntiFling(p10)
+			function t2.ToggleAntiFling(p10)
 				u84.Config.AntiFling = p10
 
 				if u82 then
@@ -1699,24 +1699,20 @@ do
 					local v720 = Character and Character:FindFirstChild("HumanoidRootPart")
 
 					if v719 and not (v719.Health <= 0) and v720 then
-						local ping = 0.08
+						local n4 = 0.06
+
 						if u127 then
 							local Network = u127:FindFirstChild("Network")
 							local v723 = Network and Network:FindFirstChild("ServerStatsItem")
 							local v724 = v723 and v723:FindFirstChild("Data Ping")
+
 							if v724 then
-								ping = v724:GetValue() / 1000
+								n4 = v724:GetValue() / 1000
 							end
 						end
-						-- IMPROVED: base 0.12 + ping*1.1 + distance compensation
-						local dist = 0
-						if u126.RootPart then
-							dist = (u126.RootPart.Position - v720.Position).Magnitude
-						end
-						local baseDelay = 0.12
-						local distComp = math.clamp(dist * 0.0015, 0, 0.30)
-						local v725 = ping * 1.1 + baseDelay + distComp
-						local v726 = math.clamp(v725, 0.05, 1.25)
+
+						local v725 = n4 + 0.04
+						local v726 = math.clamp(v725, 0, 1)
 						local Position = v720.Position
 						local AssemblyLinearVelocity = v720.AssemblyLinearVelocity
 						local MoveDirection = v719.MoveDirection
@@ -1728,10 +1724,10 @@ do
 						local v730 = Position + AssemblyLinearVelocity * v726
 
 						if v719.FloorMaterial == Enum.Material.Air then
-							v730 = v730 + Vector3.new(0, -0.5 * u128.Gravity * v726 * v726, 0)
+							v730 = v730 + 0.5 * Vector3.new(0, -u128.Gravity, 0) * v726 ^ 2
 						end
 
-						if v730.Y < Position.Y - 1.5 and v719.FloorMaterial ~= Enum.Material.Air then
+						if v730.Y < Position.Y - 1 and v719.FloorMaterial ~= Enum.Material.Air then
 							v730 = Vector3.new(v730.X, Position.Y, v730.Z)
 						end
 
@@ -1748,76 +1744,96 @@ do
 			local u130 = Workspace
 
 			function t2.ShootMurderer()
-				if not u129.Character or not u129.RootPart or not u129.Backpack then
-					return false
-				end
-				local v731 = u129.Character:FindFirstChild("Gun") or u129.Backpack:FindFirstChild("Gun")
-				if not v731 then
-					return false
-				end
-				local v732 = u129.Prediction()
-				if not v732 then
-					return false
-				end
-				local v733 = u129.FindMurderer()
-				if not v733 or not v733.Character then
-					return false
-				end
-				-- IMPROVED: optional wall check, improved filter, search recursively
-				local RootPartPosition = u129.RootPart.Position
-				local v739 = v732 - RootPartPosition
-				if v739.Magnitude ~= 0 then
-					-- Only do raycast if you want legit shoot. Set to false to always shoot through thin walls
-					local doWallCheck = true
-					if doWallCheck and not u129.Config.WallBangEnabled then
-						local raycastParams = RaycastParams.new()
-						raycastParams.FilterDescendantsInstances = {u129.Character, u130.CurrentCamera}
-						raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-						local raycastResult = u130:Raycast(RootPartPosition, v739.Unit * (v739.Magnitude + 2), raycastParams)
-						if raycastResult and raycastResult.Instance and not raycastResult.Instance:IsDescendantOf(v733.Character) then
-							-- Wall detected, don't shoot unless WallBang enabled
-							-- return false -- comment to allow shoot anyway
+				if u129.Character and u129.RootPart and u129.Backpack then
+					local v731 = u129.Character and u129.Character:FindFirstChild("Gun") or u129.Backpack and u129.Backpack:FindFirstChild("Gun")
+
+					if v731 then
+						local v732 = u129.Prediction()
+
+						if v732 then
+							local v733 = u129.FindMurderer()
+
+							if v733 and v733.Character then
+								local raycastParams = RaycastParams.new()
+								local t13 = {}
+								local Character = u129.Character
+								local CurrentCamera = u130.CurrentCamera
+
+								t13[1] = Character
+								t13[2] = CurrentCamera
+								raycastParams.FilterDescendantsInstances = t13
+								raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+								local RootPartPosition = u129.RootPart.Position
+								local v739 = v732 - RootPartPosition
+
+								if v739.Magnitude ~= 0 then
+									local raycastResult = u130:Raycast(RootPartPosition, v739.Unit * (v739.Magnitude + 2), raycastParams)
+
+									if not raycastResult or not raycastResult.Instance or raycastResult.Instance:IsDescendantOf(v733.Character) then
+										if v731.Parent == u129.Backpack then
+											v731.Parent = u129.Character
+											task.wait()
+										end
+
+										local KnifeLocal = v731:FindFirstChild("KnifeLocal")
+										local Shoot = v731:FindFirstChild("Shoot")
+
+										if not KnifeLocal then
+											if Shoot and Shoot:IsA("RemoteEvent") then
+												local spawn = task.spawn
+												local u744 = v732
+
+												spawn(function()
+													pcall(function()
+														local cFrame = CFrame.lookAt(RootPartPosition, u744)
+														local v1368 = (function(...)
+															local t14 = { ... }
+
+															t14.n = select("#", ...)
+
+															return t14
+														end)(CFrame.new(u744))
+
+														Shoot:FireServer(cFrame, unpack(v1368, 1, v1368.n))
+													end)
+												end)
+											end
+										else
+											local CreateBeam = KnifeLocal:FindFirstChild("CreateBeam")
+											local v746 = CreateBeam and CreateBeam:FindFirstChild("RemoteFunction")
+
+											if v746 then
+												local spawn = task.spawn
+												local u748 = v746
+												local u749 = v732
+
+												spawn(function()
+													pcall(function()
+														u748:InvokeServer(1, u749, "AH2")
+													end)
+												end)
+											end
+										end
+
+										return true
+									end
+
+									return false
+								end
+
+								return false
+							end
+
+							return false
 						end
+
+						return false
 					end
+
+					return false
 				end
-				-- Equip gun properly
-				if v731.Parent == u129.Backpack then
-					if u129.Humanoid then
-						pcall(function() u129.Humanoid:EquipTool(v731) end)
-						task.wait(0.08)
-					else
-						v731.Parent = u129.Character
-						task.wait()
-					end
-				end
-				local KnifeLocal = v731:FindFirstChild("KnifeLocal") or v731:FindFirstChild("KnifeLocal", true)
-				local Shoot = v731:FindFirstChild("Shoot") or v731:FindFirstChild("Shoot", true)
-				if not KnifeLocal then
-					if Shoot and Shoot:IsA("RemoteEvent") then
-						local u744 = v732
-						task.spawn(function()
-							pcall(function()
-								local cFrame = CFrame.lookAt(RootPartPosition, u744)
-								-- FIX: use direct CFrame, no unpack needed
-								Shoot:FireServer(cFrame, CFrame.new(u744))
-							end)
-						end)
-						return true
-					end
-				else
-					local CreateBeam = KnifeLocal:FindFirstChild("CreateBeam") or KnifeLocal:FindFirstChild("CreateBeam", true)
-					local v746 = CreateBeam and (CreateBeam:FindFirstChild("RemoteFunction") or CreateBeam:FindFirstChild("RemoteFunction", true))
-					if v746 then
-						local u748 = v746
-						local u749 = v732
-						task.spawn(function()
-							pcall(function()
-								u748:InvokeServer(1, u749, "AH2")
-							end)
-						end)
-						return true
-					end
-				end
+
 				return false
 			end
 			local u131 = nil
@@ -2764,66 +2780,100 @@ do
 	local u188 = Workspace
 
 	function t2.ExecuteSilentThrow()
-		if u185.FindMurderer() ~= u35 then
-			return
-		end
-		local v872
-		if u35 and u35.Character then
-			local Humanoid = u35.Character:FindFirstChild("Humanoid")
-			local HumanoidRootPart = u35.Character:FindFirstChild("HumanoidRootPart")
-			v872 = Humanoid and (HumanoidRootPart and Humanoid.Health > 0)
-		else
-			v872 = false
-		end
-		if not v872 then return end
-		local Character = u35.Character
-		local v874 = Character and Character:FindFirstChild("Knife") or u185.Backpack and u185.Backpack:FindFirstChild("Knife")
-		if not v874 then return end
-		local Events = v874:FindFirstChild("Events") or v874:FindFirstChild("Events", true)
-		local u876 = Events and (Events:FindFirstChild("KnifeThrown") or Events:FindFirstChild("KnifeThrown", true))
-		if not u876 then return end
-		local v877 = u186(u185.RootPart.Position, u185.Config.KnifeThrowAura)
-		if not v877 then return end
-		if v874.Parent == u185.Backpack and u185.Humanoid then
-			pcall(function() u185.Humanoid:EquipTool(v874) end)
-			task.wait(0.06)
-		end
-		local Character4 = v877.Character
-		local v879 = Character4 and Character4:FindFirstChild("HumanoidRootPart")
-		local v880 = Character4 and Character4:FindFirstChild("Humanoid")
-		if not v879 or not v880 then return end
-		local ping = 0.06
-		if u187 then
-			local Network = u187:FindFirstChild("Network")
-			local v883 = Network and Network:FindFirstChild("ServerStatsItem")
-			local v884 = v883 and v883:FindFirstChild("Data Ping")
-			if v884 then
-				ping = v884:GetValue() / 1000
+		if u185.FindMurderer() == u35 then
+			local v872
+
+			if u35 and u35.Character then
+				local Humanoid = u35.Character:FindFirstChild("Humanoid")
+				local HumanoidRootPart = u35.Character:FindFirstChild("HumanoidRootPart")
+
+				v872 = Humanoid and (HumanoidRootPart and Humanoid.Health > 0)
+			else
+				v872 = false
+			end
+
+			if v872 then
+				local Character = u35.Character
+				local v874 = Character and Character:FindFirstChild("Knife") or u185.Backpack and u185.Backpack:FindFirstChild("Knife")
+
+				if v874 then
+					local Events = v874:FindFirstChild("Events")
+					local u876 = Events and Events:FindFirstChild("KnifeThrown")
+
+					if u876 then
+						local v877 = u186(u185.RootPart.Position, u185.Config.KnifeThrowAura)
+
+						if v877 then
+							if v874.Parent == u185.Backpack and u185.Humanoid then
+								u185.Humanoid:EquipTool(v874)
+								task.wait(0.05)
+							end
+
+							local Character4 = v877.Character
+							local v879 = Character4 and Character4:FindFirstChild("HumanoidRootPart")
+							local v880 = Character4 and Character4:FindFirstChild("Humanoid")
+
+							if v879 and v880 then
+								local n7 = 0.06
+
+								if u187 then
+									local Network = u187:FindFirstChild("Network")
+									local v883 = Network and Network:FindFirstChild("ServerStatsItem")
+									local v884 = v883 and v883:FindFirstChild("Data Ping")
+
+									if v884 then
+										n7 = v884:GetValue() / 1000
+									end
+								end
+
+								local v885 = n7 + 0.05
+								local v886 = math.clamp(v885, 0.01, 1)
+								local AssemblyLinearVelocity = v879.AssemblyLinearVelocity
+
+								if AssemblyLinearVelocity.Magnitude < 0.5 and v880.MoveDirection.Magnitude > 0 then
+									AssemblyLinearVelocity = v880.MoveDirection * v880.WalkSpeed
+								end
+
+								local u888 = v879.Position + AssemblyLinearVelocity * v886
+
+								if v880.FloorMaterial ~= Enum.Material.Air then
+									if u888.Y < v879.Position.Y - 1 then
+										u888 = Vector3.new(u888.X, v879.Position.Y, u888.Z)
+									end
+								else
+									local v889 = 0.5 * u188.Gravity * v886 ^ 2
+
+									u888 = u888 - Vector3.new(0, v889, 0)
+								end
+
+								pcall(function()
+									local cFrame = CFrame.new(u185.RootPart.Position)
+									local v1227 = (function(...)
+										local t20 = { ... }
+
+										t20.n = select("#", ...)
+
+										return t20
+									end)(CFrame.new(u888))
+
+									u876:FireServer(cFrame, unpack(v1227, 1, v1227.n))
+								end)
+
+								return
+							end
+
+							return
+						end
+
+						return
+					end
+
+					return
+				end
+
+				return
 			end
 		end
-		-- IMPROVED: ping compensation + distance compensation
-		local dist = (u185.RootPart.Position - v879.Position).Magnitude
-		local distComp = math.clamp(dist * 0.0018, 0, 0.35)
-		local v885 = ping * 1.2 + 0.12 + distComp
-		local v886 = math.clamp(v885, 0.05, 1.25)
-		local AssemblyLinearVelocity = v879.AssemblyLinearVelocity
-		if AssemblyLinearVelocity.Magnitude < 0.5 and v880.MoveDirection.Magnitude > 0 then
-			AssemblyLinearVelocity = v880.MoveDirection * v880.WalkSpeed
-		end
-		local u888 = v879.Position + AssemblyLinearVelocity * v886
-		if v880.FloorMaterial ~= Enum.Material.Air then
-			if u888.Y < v879.Position.Y - 1 then
-				u888 = Vector3.new(u888.X, v879.Position.Y, u888.Z)
-			end
-		else
-			local v889 = 0.5 * u188.Gravity * v886 * v886
-			u888 = u888 - Vector3.new(0, v889, 0)
-		end
-		pcall(function()
-			local cFrame = CFrame.new(u185.RootPart.Position)
-			-- FIX: no unpack needed
-			u876:FireServer(cFrame, CFrame.new(u888))
-		end)
 	end
 
 	local u189 = t2
