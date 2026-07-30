@@ -1,3 +1,6 @@
+-- This file was generated at discord.gg/syncrypt
+-- MoonVeil Deobfuscator Created By Skynex Okinbru
+
 if not game:IsLoaded() then
 	pcall(function()
 		local Loaded = game.Loaded
