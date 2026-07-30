@@ -1007,16 +1007,15 @@ do
 											local Position = v489.Position
 											-- ===== SHADOW ENHANCED PREDICTION (أسرع وأدق) =====
 											local distance = (Position - v488.Position).Magnitude
-											local v492 = distance / 180  -- أسرع من 250
+											local v492 = distance / 180
 											if u13 then
 												local ok, result = pcall(function()
 													return u87:GetNetworkPing()
 												end)
 												if ok and result then
-													v492 = v492 + result * 0.9  -- تعويض بنق أقوى
+													v492 = v492 + result * 0.9
 												end
 											end
-											-- إضافة زمن وصول المقذوف (السكينة/الرصاصة)
 											local bulletTime = distance / 200 * 0.6
 											v492 = v492 + bulletTime
 
@@ -1053,196 +1052,140 @@ do
 						local u95 = LocalPlayer
 
 						-- ========================================================== --
-						-- ♻️ UPGRADED: محرك Vision Hub داخل RuzHub (Shoot & Throw)   --
+						-- ♻️ UPGRADED: محرك Vision Hub (بدون إشعارات)                --
 						-- ========================================================== --
 
-						-- 🔥 دالة الرصاص الجديدة (مستوحاة من Vision Hub)
+						-- 🔥 دالة الرصاص (صامتة تماماً)
 						local function u97()
-						    local Character = u89.Character
-						    if not Character then return end
-						    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-						    if not HumanoidRootPart then return end
+							local Character = u89.Character
+							if not Character then return end
+							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							if not HumanoidRootPart then return end
 
-						    -- 1. البحث عن الهدف (مجرم أو أقرب لاعب)
-						    local target = u82
-						    if not target then
-						        local closest, minDist = nil, math.huge
-						        for _, player in ipairs(u94:GetPlayers()) do
-						            if player ~= u92 and player.Character then
-						                local root = player.Character:FindFirstChild("HumanoidRootPart")
-						                local hum = player.Character:FindFirstChildOfClass("Humanoid")
-						                if root and hum and hum.Health > 0 then
-						                    local dist = (root.Position - HumanoidRootPart.Position).Magnitude
-						                    if dist < minDist then
-						                        minDist = dist
-						                        closest = player.Character
-						                    end
-						                end
-						            end
-						        end
-						        target = closest
-						    end
-						    if not target then
-						        u90:Notify({Title = "RuzHub", Content = "No target!", Duration = 2})
-						        return
-						    end
-						    u82 = target
+							local target = u82
+							if not target then
+								local closest, minDist = nil, math.huge
+								for _, player in ipairs(u94:GetPlayers()) do
+									if player ~= u92 and player.Character then
+										local root = player.Character:FindFirstChild("HumanoidRootPart")
+										local hum = player.Character:FindFirstChildOfClass("Humanoid")
+										if root and hum and hum.Health > 0 then
+											local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+											if dist < minDist then
+												minDist = dist
+												closest = player.Character
+											end
+										end
+									end
+								end
+								target = closest
+							end
+							if not target then return end
+							u82 = target
 
-						    -- 2. تجهيز السلاح (المسدس)
-						    local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
-						    if not gun then
-						        u90:Notify({Title = "RuzHub", Content = "No gun!", Duration = 2})
-						        return
-						    end
-						    if Character ~= gun.Parent then
-						        Character.Humanoid:EquipTool(gun)
-						        task.wait(0.05)
-						    end
+							local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+							if not gun then return end
 
-						    -- 3. تحديد موقع الهدف المتوقع (من الكرة u91)
-						    local targetPos = u91 and u91.CFrame.Position
-						    if not targetPos then
-						        u90:Notify({Title = "RuzHub", Content = "No prediction!", Duration = 2})
-						        return
-						    end
+							if Character ~= gun.Parent then
+								Character.Humanoid:EquipTool(gun)
+								task.wait(0.05)
+							end
 
-						    -- 4. البحث عن الـ Remote (بشكل شامل مثل Vision Hub)
-						    local shootRemote = gun:FindFirstChild("Shoot")
-						    if not shootRemote or not shootRemote:IsA("RemoteEvent") then
-						        local events = gun:FindFirstChild("Events") or gun:FindFirstChild("Remotes")
-						        if events then
-						            shootRemote = events:FindFirstChild("Shoot") or events:FindFirstChild("Fire")
-						        end
-						    end
-						    if not shootRemote or not shootRemote:IsA("RemoteEvent") then
-						        for _, child in ipairs(gun:GetDescendants()) do
-						            if child:IsA("RemoteEvent") and (child.Name:lower():find("shoot") or child.Name:lower():find("fire")) then
-						                shootRemote = child
-						                break
-						            end
-						        end
-						    end
-						    if not shootRemote then
-						        u90:Notify({Title = "RuzHub", Content = "Remote not found!", Duration = 2})
-						        return
-						    end
+							local targetPos = u91 and u91.CFrame.Position
+							if not targetPos then return end
 
-						    -- 5. إرسال الطلقة (مع تعويض البنق والصيغ المتعددة)
-						    local startPos = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
-						    local cFrame = CFrame.new(startPos, targetPos)
-						    local success = false
-						    pcall(function()
-						        shootRemote:FireServer(cFrame, CFrame.new(targetPos))
-						        success = true
-						    end)
-						    if not success then
-						        pcall(function()
-						            shootRemote:FireServer(targetPos, CFrame.new(targetPos))
-						            success = true
-						        end)
-						    end
-						    if not success then
-						        pcall(function()
-						            shootRemote:FireServer(targetPos)
-						            success = true
-						        end)
-						    end
-						    if success then
-						        u90:Notify({Title = "RuzHub", Content = "🔫 Shot fired!", Duration = 1})
-						    end
+							local shootRemote = gun:FindFirstChild("Shoot")
+							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
+								local events = gun:FindFirstChild("Events") or gun:FindFirstChild("Remotes")
+								if events then
+									shootRemote = events:FindFirstChild("Shoot") or events:FindFirstChild("Fire")
+								end
+							end
+							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
+								for _, child in ipairs(gun:GetDescendants()) do
+									if child:IsA("RemoteEvent") and (child.Name:lower():find("shoot") or child.Name:lower():find("fire")) then
+										shootRemote = child
+										break
+									end
+								end
+							end
+							if not shootRemote then return end
+
+							local startPos = HumanoidRootPart.Position + Vector3.new(0, 1, 0)
+							local cFrame = CFrame.new(startPos, targetPos)
+							pcall(function()
+								shootRemote:FireServer(cFrame, CFrame.new(targetPos))
+							end)
 						end
 
-						-- 🗡️ دالة رمي السكين الجديدة (مستوحاة من Vision Hub)
+						-- 🗡️ دالة رمي السكين (صامتة تماماً)
 						local function u96()
-						    local Character = u92.Character
-						    if not Character then return end
-						    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-						    if not HumanoidRootPart then return end
+							local Character = u92.Character
+							if not Character then return end
+							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+							if not HumanoidRootPart then return end
 
-						    -- 1. البحث عن السكين
-						    local knife = u92.Backpack:FindFirstChild("Knife") or Character:FindFirstChild("Knife")
-						    if not knife then
-						        u93:Notify({Title = "RuzHub", Content = "No knife!", Duration = 2})
-						        return
-						    end
+							local knife = u92.Backpack:FindFirstChild("Knife") or Character:FindFirstChild("Knife")
+							if not knife then return end
 
-						    -- 2. البحث عن الهدف (أقرب لاعب أو مجرم)
-						    local target = u82
-						    if not target then
-						        local closest, minDist = nil, math.huge
-						        for _, player in ipairs(u94:GetPlayers()) do
-						            if player ~= u92 and player.Character then
-						                local root = player.Character:FindFirstChild("HumanoidRootPart")
-						                local hum = player.Character:FindFirstChildOfClass("Humanoid")
-						                if root and hum and hum.Health > 0 then
-						                    local dist = (root.Position - HumanoidRootPart.Position).Magnitude
-						                    if dist < minDist then
-						                        minDist = dist
-						                        closest = player.Character
-						                    end
-						                end
-						            end
-						        end
-						        target = closest
-						    end
-						    if not target then
-						        u93:Notify({Title = "RuzHub", Content = "No target!", Duration = 2})
-						        return
-						    end
-						    u82 = target
+							local target = u82
+							if not target then
+								local closest, minDist = nil, math.huge
+								for _, player in ipairs(u94:GetPlayers()) do
+									if player ~= u92 and player.Character then
+										local root = player.Character:FindFirstChild("HumanoidRootPart")
+										local hum = player.Character:FindFirstChildOfClass("Humanoid")
+										if root and hum and hum.Health > 0 then
+											local dist = (root.Position - HumanoidRootPart.Position).Magnitude
+											if dist < minDist then
+												minDist = dist
+												closest = player.Character
+											end
+										end
+									end
+								end
+								target = closest
+							end
+							if not target then return end
+							u82 = target
 
-						    -- 3. تجهيز السكين
-						    if Character ~= knife.Parent then
-						        Character.Humanoid:EquipTool(knife)
-						        task.wait(0.05)
-						    end
+							if Character ~= knife.Parent then
+								Character.Humanoid:EquipTool(knife)
+								task.wait(0.05)
+							end
 
-						    -- 4. تحديد موقع الهدف المتوقع (باستخدام الكرة u91)
-						    local targetPos = u91 and u91.CFrame.Position
-						    if not targetPos then
-						        u93:Notify({Title = "RuzHub", Content = "No prediction!", Duration = 2})
-						        return
-						    end
+							local targetPos = u91 and u91.CFrame.Position
+							if not targetPos then return end
 
-						    -- 5. البحث عن Remote رمي السكين (بشكل شامل)
-						    local throwRemote = nil
-						    local events = knife:FindFirstChild("Events") or knife:FindFirstChild("Remotes")
-						    if events then
-						        throwRemote = events:FindFirstChild("KnifeThrown") or events:FindFirstChild("Throw") or events:FindFirstChild("Fire")
-						    end
-						    if not throwRemote or not throwRemote:IsA("RemoteEvent") then
-						        for _, child in ipairs(knife:GetDescendants()) do
-						            if child:IsA("RemoteEvent") and (child.Name:lower():find("knife") or child.Name:lower():find("throw")) then
-						                throwRemote = child
-						                break
-						            end
-						        end
-						    end
-						    if not throwRemote then
-						        u93:Notify({Title = "RuzHub", Content = "Throw remote not found!", Duration = 2})
-						        return
-						    end
+							local throwRemote = nil
+							local events = knife:FindFirstChild("Events") or knife:FindFirstChild("Remotes")
+							if events then
+								throwRemote = events:FindFirstChild("KnifeThrown") or events:FindFirstChild("Throw") or events:FindFirstChild("Fire")
+							end
+							if not throwRemote or not throwRemote:IsA("RemoteEvent") then
+								for _, child in ipairs(knife:GetDescendants()) do
+									if child:IsA("RemoteEvent") and (child.Name:lower():find("knife") or child.Name:lower():find("throw")) then
+										throwRemote = child
+										break
+									end
+								end
+							end
+							if not throwRemote then return end
 
-						    -- 6. إرسال الرمية (مع نفس صيغ Vision Hub)
-						    local startPos = HumanoidRootPart.Position
-						    local cFrame = CFrame.new(startPos, targetPos)
-						    pcall(function()
-						        throwRemote:FireServer(cFrame, CFrame.new(targetPos))
-						        u93:Notify({Title = "RuzHub", Content = "🗡️ Knife thrown!", Duration = 1})
-						    end)
+							local startPos = HumanoidRootPart.Position
+							local cFrame = CFrame.new(startPos, targetPos)
+							pcall(function()
+								throwRemote:FireServer(cFrame, CFrame.new(targetPos))
+							end)
 						end
 
-						-- دالة التوجيه (تبقى كما هي)
 						function u98()
 							if u95.Character then
 								if not u95.Backpack:FindFirstChild("Knife") and (not u95.Character or not u95.Character:FindFirstChild("Knife")) then
 									u97()
-
 									return
 								end
-
 								u96()
-
 								return
 							end
 						end
@@ -4240,10 +4183,4 @@ task.wait(0.4)
 v232(true)
 v239(true)
 v244(true)
-v18:Notify({
-	Title = "RuzHub",
-	Content = tostring("RuzHub v7.3 (Shadow Enhanced + Vision Engine) ready!"),
-	Duration = 3,
-	Icon = "bell",
-})
 print("[RuzHub] v7.3 (Shadow Enhanced + Vision Engine) loaded.")
