@@ -27,7 +27,6 @@ do
 					CurrentCamera = Workspace.CurrentCamera
 					u9 = false
 					u10 = false
-					-- Shadow: متغير قفل الأزرار
 					local buttonLocked = false
 					n1 = 200
 					n2 = 200
@@ -268,15 +267,6 @@ do
 
 								MouseButton1Click2:Connect(function()
 									u408(u386)
-
-									local v853 = u409 .. " set to " .. u386
-
-									u23:Notify({
-										Title = "RuzHub",
-										Content = tostring(v853),
-										Duration = 3,
-										Icon = "bell",
-									})
 								end)
 
 								local TextButton4 = Instance.new("TextButton", Frame4)
@@ -486,13 +476,6 @@ do
 													if u17 then
 														u40(child)
 													end
-
-													u41:Notify({
-														Title = "RuzHub",
-														Content = tostring("Gun dropped on the map!"),
-														Duration = 3,
-														Icon = "bell",
-													})
 												end
 
 												if child:IsA("Model") or child:IsA("Folder") then
@@ -547,13 +530,6 @@ do
 										if u17 then
 											u45(p17)
 										end
-
-										u46:Notify({
-											Title = "RuzHub",
-											Content = tostring("Gun dropped on the map!"),
-											Duration = 3,
-											Icon = "bell",
-										})
 									end
 								end)
 							end
@@ -573,13 +549,6 @@ do
 										if u17 then
 											u49(GunDrop)
 										end
-
-										u50:Notify({
-											Title = "RuzHub",
-											Content = tostring("Gun dropped on the map!"),
-											Duration = 3,
-											Icon = "bell",
-										})
 									end
 								end)
 							end
@@ -614,13 +583,6 @@ do
 																		if u17 then
 																			u52(GunDrop)
 																		end
-
-																		u53:Notify({
-																			Title = "RuzHub",
-																			Content = tostring("Gun dropped on the map!"),
-																			Duration = 3,
-																			Icon = "bell",
-																		})
 																	end
 																end)
 															end
@@ -646,13 +608,6 @@ do
 																		if u17 then
 																			u52(GunDrop)
 																		end
-
-																		u53:Notify({
-																			Title = "RuzHub",
-																			Content = tostring("Gun dropped on the map!"),
-																			Duration = 3,
-																			Icon = "bell",
-																		})
 																	end
 																end)
 															end
@@ -699,13 +654,6 @@ do
 																if u17 then
 																	u59(GunDrop)
 																end
-
-																u60:Notify({
-																	Title = "RuzHub",
-																	Content = tostring("Gun dropped on the map!"),
-																	Duration = 3,
-																	Icon = "bell",
-																})
 															end
 														end)
 													end
@@ -731,13 +679,6 @@ do
 																if u17 then
 																	u59(GunDrop)
 																end
-
-																u60:Notify({
-																	Title = "RuzHub",
-																	Content = tostring("Gun dropped on the map!"),
-																	Duration = 3,
-																	Icon = "bell",
-																})
 															end
 														end)
 													end
@@ -887,14 +828,6 @@ do
 
 									return
 								end
-
-								u70:Notify({
-									Title = "RuzHub",
-									Content = tostring("ESP remote not found!"),
-									Duration = 3,
-									Icon = "bell",
-								})
-								u61 = false
 							end
 						end
 
@@ -1005,7 +938,6 @@ do
 
 										if v489 then
 											local Position = v489.Position
-											-- ===== SHADOW ENHANCED PREDICTION (أسرع وأدق) =====
 											local distance = (Position - v488.Position).Magnitude
 											local v492 = distance / 180
 											if u13 then
@@ -1052,18 +984,26 @@ do
 						local u95 = LocalPlayer
 
 						-- ========================================================== --
-						-- ♻️ UPGRADED: محرك Vision Hub (بدون إشعارات)                --
+						-- ♻️ ULTIMATE ENGINE: محرك Vision Hub الأصلي للرصاص         --
 						-- ========================================================== --
 
-						-- 🔥 دالة الرصاص (صامتة تماماً)
 						local function u97()
 							local Character = u89.Character
 							if not Character then return end
 							local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
 							if not HumanoidRootPart then return end
 
-							local target = u82
-							if not target then
+							local targetChar = nil
+							for _, player in ipairs(u94:GetPlayers()) do
+								if player ~= u92 and player.Character then
+									local role = player:FindFirstChild("role") or player:FindFirstChild("PlayerRole")
+									if role and (role.Value == "Murderer") then
+										targetChar = player.Character
+										break
+									end
+								end
+							end
+							if not targetChar then
 								local closest, minDist = nil, math.huge
 								for _, player in ipairs(u94:GetPlayers()) do
 									if player ~= u92 and player.Character then
@@ -1078,21 +1018,53 @@ do
 										end
 									end
 								end
-								target = closest
+								targetChar = closest
 							end
-							if not target then return end
-							u82 = target
+							if not targetChar then return end
+							u82 = targetChar
 
 							local gun = u89.Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
 							if not gun then return end
-
 							if Character ~= gun.Parent then
 								Character.Humanoid:EquipTool(gun)
 								task.wait(0.05)
 							end
 
-							local targetPos = u91 and u91.CFrame.Position
-							if not targetPos then return end
+							local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+							local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
+							if not targetRoot or not targetHum or targetHum.Health <= 0 then return end
+
+							local n4 = 0.06
+							local stats = game:GetService("Stats")
+							local network = stats:FindFirstChild("Network")
+							if network then
+								local item = network:FindFirstChild("ServerStatsItem")
+								if item then
+									local pingItem = item:FindFirstChild("Data Ping")
+									if pingItem then
+										n4 = pingItem:GetValue() / 1000
+									end
+								end
+							end
+
+							local v725 = n4 + 0.04
+							local v726 = math.clamp(v725, 0, 1)
+							local Position = targetRoot.Position
+							local AssemblyLinearVelocity = targetRoot.AssemblyLinearVelocity
+							local MoveDirection = targetHum.MoveDirection
+
+							if AssemblyLinearVelocity.Magnitude < 0.1 and MoveDirection.Magnitude > 0 then
+								AssemblyLinearVelocity = MoveDirection * targetHum.WalkSpeed
+							end
+
+							local targetPos = Position + AssemblyLinearVelocity * v726
+							local workspace = game:GetService("Workspace")
+							if targetHum.FloorMaterial == Enum.Material.Air then
+								targetPos = targetPos + 0.5 * Vector3.new(0, -workspace.Gravity, 0) * v726 ^ 2
+							end
+							if targetPos.Y < Position.Y - 1 and targetHum.FloorMaterial ~= Enum.Material.Air then
+								targetPos = Vector3.new(targetPos.X, Position.Y, targetPos.Z)
+							end
 
 							local shootRemote = gun:FindFirstChild("Shoot")
 							if not shootRemote or not shootRemote:IsA("RemoteEvent") then
@@ -1118,7 +1090,6 @@ do
 							end)
 						end
 
-						-- 🗡️ دالة رمي السكين (صامتة تماماً)
 						local function u96()
 							local Character = u92.Character
 							if not Character then return end
@@ -1542,17 +1513,6 @@ do
 
 								return
 							end
-
-							local v601 = "No " .. p23 .. " found!"
-
-							u114:Notify({
-								Title = "RuzHub",
-								Content = tostring(v601),
-								Duration = 3,
-								Icon = "bell",
-							})
-
-							return
 						end
 					end
 
@@ -1712,12 +1672,6 @@ do
 						end
 
 						u141 = false
-						u144:Notify({
-							Title = "RuzHub",
-							Content = tostring("Skybox restored to default."),
-							Duration = 3,
-							Icon = "bell",
-						})
 					end
 
 					local u146 = Lighting
@@ -1870,14 +1824,7 @@ do
 												local v673 = v663 or (Head or v666)
 
 												if not v673 then
-													local v674 = p29.Name .. " — no valid fling part."
-
-													u159:Notify({
-														Title = "RuzHub",
-														Content = tostring(v674),
-														Duration = 3,
-														Icon = "bell",
-													})
+													return
 												else
 													(function(p33)
 														local v904 = tick() + 2.5
@@ -1987,12 +1934,6 @@ do
 													until n19 > 30 or (RootPart.Position - getgenv().RuzOldPos.p).Magnitude < 25
 
 													u160.FallenPartsDestroyHeight = getgenv().RuzFPDH
-													u159:Notify({
-														Title = "RuzHub",
-														Content = tostring("Returned to previous position."),
-														Duration = 3,
-														Icon = "bell",
-													})
 												end
 
 												u157 = false
@@ -2002,17 +1943,6 @@ do
 
 											return
 										end
-
-										local v680 = p29.Name .. " is sitting, skipped."
-
-										u159:Notify({
-											Title = "RuzHub",
-											Content = tostring(v680),
-											Duration = 3,
-											Icon = "bell",
-										})
-
-										return
 									end
 
 									return
@@ -2112,12 +2042,6 @@ do
 
 					t16 = {}
 					u181.Visible = false
-					u182:Notify({
-						Title = "RuzHub",
-						Content = tostring("Low Graphics OFF"),
-						Duration = 3,
-						Icon = "bell",
-					})
 				end
 
 				u184 = v183
@@ -2220,7 +2144,6 @@ do
 			t25 = {}
 
 			local u217 = UserInputService
-			-- ===== SHADOW LOCK: دالة السحب المعدلة (تم إضافة شرط القفل) =====
 			function u218(p35)
 				local u740 = nil
 				local p36Position = nil
@@ -2242,7 +2165,6 @@ do
 				InputChanged:Connect(function(p37)
 					if u740 then
 						if p37.UserInputType == Enum.UserInputType.MouseMovement or p37.UserInputType == Enum.UserInputType.Touch then
-							-- Shadow Lock: يمنع السحب إذا كان القفل مفعّلاً
 							if not buttonLocked then
 								local v923 = p37.Position - p36Position
 								u746.Position = UDim2.new(Position.X.Scale, Position.X.Offset + v923.X, Position.Y.Scale, Position.Y.Offset + v923.Y)
@@ -2373,18 +2295,9 @@ do
 					u226.GoldBomb.btn.MouseButton1Click:Connect(function()
 						if not u9 then
 							u231("GoldBomb", true)
-
 							return
 						end
-
-						u230:Notify({
-							Title = "RuzHub",
-							Content = tostring("Gold Bomb on cooldown."),
-							Duration = 3,
-							Icon = "bell",
-						})
 					end)
-
 					return
 				end
 
@@ -2407,18 +2320,9 @@ do
 					u233.NormalBomb.btn.MouseButton1Click:Connect(function()
 						if not u10 then
 							u238("FakeBomb", false)
-
 							return
 						end
-
-						u237:Notify({
-							Title = "RuzHub",
-							Content = tostring("Normal Bomb on cooldown."),
-							Duration = 3,
-							Icon = "bell",
-						})
 					end)
-
 					return
 				end
 
@@ -2476,15 +2380,6 @@ do
 					else
 						u249()
 					end
-
-					local v927 = u61 and "ESP ON" or "ESP OFF"
-
-					u251:Notify({
-						Title = "RuzHub",
-						Content = tostring(v927),
-						Duration = 3,
-						Icon = "bell",
-					})
 				end)
 
 				return
@@ -2526,15 +2421,6 @@ do
 				u259("Speed", u260.Speed, u261, Color3.fromRGB(0, 140, 120), "SPEED")
 				u258.Speed.btn.MouseButton1Click:Connect(function()
 					u116 = not u116
-
-					local v928 = u116 and "Speed Glitch ON" or "Speed Glitch OFF"
-
-					u262:Notify({
-						Title = "RuzHub",
-						Content = tostring(v928),
-						Duration = 3,
-						Icon = "bell",
-					})
 				end)
 
 				return
@@ -2559,15 +2445,6 @@ do
 				u264.Stretch.btn.MouseButton1Click:Connect(function()
 					u120 = not u120
 					u268(u120)
-
-					local v929 = u120 and "Stretch ON" or "Stretch OFF"
-
-					u269:Notify({
-						Title = "RuzHub",
-						Content = tostring(v929),
-						Duration = 3,
-						Icon = "bell",
-					})
 				end)
 
 				return
@@ -2609,35 +2486,14 @@ do
 					v611.CFrame = CFrame.new(v613 + Vector3.new(0, 2, 0))
 					task.wait(0.2)
 					v611.CFrame = CFrame5
-					u130:Notify({
-						Title = "RuzHub",
-						Content = tostring("Teleported to gun!"),
-						Duration = 3,
-						Icon = "bell",
-					})
-
 					return
 				end
-
-				u130:Notify({
-					Title = "RuzHub",
-					Content = tostring("Gun position not found!"),
-					Duration = 3,
-					Icon = "bell",
-				})
 
 				return
 			end
 
 			return
 		end
-
-		u130:Notify({
-			Title = "RuzHub",
-			Content = tostring("No gun on map!"),
-			Duration = 3,
-			Icon = "bell",
-		})
 	end
 
 	function u276(p52)
@@ -2689,37 +2545,13 @@ do
 					local Humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 
 					if Humanoid and Humanoid.Health > 0 then
-						local v684 = "Flinging: " .. player.Name
-
-						u162:Notify({
-							Title = "RuzHub",
-							Content = tostring(v684),
-							Duration = 3,
-							Icon = "bell",
-						})
 						task.spawn(u165, player)
-
 						return
 					end
 				end
 			end
-
-			u162:Notify({
-				Title = "RuzHub",
-				Content = tostring("No knife player found!"),
-				Duration = 3,
-				Icon = "bell",
-			})
-
 			return
 		end
-
-		u162:Notify({
-			Title = "RuzHub",
-			Content = tostring("Fling in progress..."),
-			Duration = 3,
-			Icon = "bell",
-		})
 	end
 
 	function u287(p54)
@@ -2752,37 +2584,13 @@ do
 					local Humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 
 					if Humanoid and Humanoid.Health > 0 then
-						local v688 = "Flinging: " .. player.Name
-
-						u166:Notify({
-							Title = "RuzHub",
-							Content = tostring(v688),
-							Duration = 3,
-							Icon = "bell",
-						})
 						task.spawn(u169, player)
-
 						return
 					end
 				end
 			end
-
-			u166:Notify({
-				Title = "RuzHub",
-				Content = tostring("No gun player found!"),
-				Duration = 3,
-				Icon = "bell",
-			})
-
 			return
 		end
-
-		u166:Notify({
-			Title = "RuzHub",
-			Content = tostring("Fling in progress..."),
-			Duration = 3,
-			Icon = "bell",
-		})
 	end
 
 	function u293(p55)
@@ -2879,7 +2687,6 @@ do
 			for _, player in ipairs(u299:GetPlayers()) do
 				if player ~= u296 and (player.Backpack:FindFirstChild("Knife") or player.Character and player.Character:FindFirstChild("Knife")) then
 					v789 = true
-
 					break
 				end
 			end
@@ -2897,7 +2704,6 @@ do
 			for _, player in ipairs(u299:GetPlayers()) do
 				if player ~= u296 and (player.Backpack:FindFirstChild("Gun") or player.Character and player.Character:FindFirstChild("Gun")) then
 					v793 = true
-
 					break
 				end
 			end
@@ -2909,19 +2715,6 @@ do
 			u295.FlingSheriff.stroke.Color = v796
 		end
 	end)
-	v18:Popup({
-		Title = "RuzHub Mmv And Mm2",
-		Icon = "sparkles",
-		Content = "v7.3 loaded!\nBombs and Shoot auto-loaded.\nOpen menu to configure everything.",
-		Buttons = {
-			{
-				Title = "Start",
-				Icon = "arrow-right",
-				Variant = "Primary",
-				Callback = function() end,
-			},
-		},
-	})
 
 	local v300 = v18:CreateWindow({
 		Title = "RuzHub",
@@ -3048,28 +2841,12 @@ v301:Button({
 			if u120 then
 				u127(true)
 			end
-
-			local v886 = "Stretch set to " .. p64 .. "%  (1.0 = normal)"
-
-			u128:Notify({
-				Title = "RuzHub",
-				Content = tostring(v886),
-				Duration = 3,
-				Icon = "bell",
-			})
 		end, function()
 			n17 = 0.5
 
 			if u120 then
 				u127(true)
 			end
-
-			u128:Notify({
-				Title = "RuzHub",
-				Content = tostring("Stretch reset to 50%"),
-				Duration = 3,
-				Icon = "bell",
-			})
 		end)
 	end,
 })
@@ -3176,15 +2953,6 @@ v301:Button({
 			FocusLost:Connect(function(p68)
 				if p68 and u636.Text ~= "" then
 					u147(u636.Text)
-
-					local v888 = "Custom skybox applied — ID: " .. u636.Text
-
-					u148:Notify({
-						Title = "RuzHub",
-						Content = tostring(v888),
-						Duration = 3,
-						Icon = "bell",
-					})
 					u636.Text = ""
 				end
 			end)
@@ -3283,15 +3051,6 @@ v301:Button({
 
 				MouseButton1Click5:Connect(function()
 					u147(u651.id)
-
-					local v889 = "Skybox applied: " .. u651.name
-
-					u148:Notify({
-						Title = "RuzHub",
-						Content = tostring(v889),
-						Duration = 3,
-						Icon = "bell",
-					})
 
 					for _, child in ipairs(u652:GetChildren()) do
 						if child:IsA("TextButton") then
@@ -3414,23 +3173,10 @@ function t31.Callback(p69)
 		end
 
 		u314.MouseIconEnabled = true
-		u313:Notify({
-			Title = "RuzHub",
-			Content = tostring("Crosshair OFF"),
-			Duration = 3,
-			Icon = "bell",
-		})
-
 		return
 	end
 
 	u312()
-	u313:Notify({
-		Title = "RuzHub",
-		Content = tostring("Crosshair ON — enable ShiftLock to see it!"),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v301:Toggle(t31)
@@ -3515,13 +3261,6 @@ v301:Button({
 					if u198 and u201 then
 						u201.Image = "rbxassetid://" .. u718.Text
 					end
-
-					u209:Notify({
-						Title = "RuzHub",
-						Content = tostring("Custom cursor applied — enable ShiftLock to see it!"),
-						Duration = 3,
-						Icon = "bell",
-					})
 					u718.Text = ""
 				end
 			end)
@@ -3561,15 +3300,6 @@ v301:Button({
 				u723.BackgroundColor3 = u199 and Color3.fromRGB(30, 160, 30) or Color3.fromRGB(80, 20, 20)
 				u723.Text = u199 and "ON" or "OFF"
 				u210()
-
-				local v919 = "Crosshair Spin: " .. (u199 and "ON" or "OFF")
-
-				u209:Notify({
-					Title = "RuzHub",
-					Content = tostring(v919),
-					Duration = 3,
-					Icon = "bell",
-				})
 			end)
 
 			local Frame8 = Instance.new("Frame", Frame)
@@ -3643,15 +3373,6 @@ v301:Button({
 					if u198 and u201 then
 						u201.Image = "rbxassetid://" .. u737.id
 					end
-
-					local v920 = "Cursor: " .. u737.name .. " — enable ShiftLock to see it!"
-
-					u209:Notify({
-						Title = "RuzHub",
-						Content = tostring(v920),
-						Duration = 3,
-						Icon = "bell",
-					})
 					u738:Destroy()
 				end)
 			end
@@ -3722,12 +3443,6 @@ local function u316()
 		end)
 	end)
 	u177.Visible = true
-	u178:Notify({
-		Title = "RuzHub",
-		Content = tostring("Low Graphics ON — FPS boost active"),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 local u317 = v183
@@ -3779,12 +3494,6 @@ local function u319()
 	v703.Saturation = 0.2
 	v703.Contrast = 0.1
 	v703.Brightness = 0.05
-	u186:Notify({
-		Title = "RuzHub",
-		Content = tostring("High Graphics ON"),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 local function u320()
 	u16 = false
@@ -3801,13 +3510,6 @@ local function u320()
 			child:Destroy()
 		end
 	end
-
-	u189:Notify({
-		Title = "RuzHub",
-		Content = tostring("High Graphics OFF"),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 function t33.Callback(p72)
@@ -3837,12 +3539,6 @@ function t34.Callback()
 	end, function()
 		n3 = 70
 		u323.FieldOfView = 70
-		u324:Notify({
-			Title = "RuzHub",
-			Content = tostring("FOV reset to 70"),
-			Duration = 3,
-			Icon = "bell",
-		})
 	end)
 end
 
@@ -3863,14 +3559,6 @@ function t35.Callback()
 	local ok, result = pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua"))()
 	end)
-	local v814 = ok and "Emotes GUI loaded!" or "Error: " .. tostring(result)
-
-	u326:Notify({
-		Title = "RuzHub",
-		Content = tostring(v814),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v301:Button(t35)
@@ -3885,14 +3573,6 @@ function t36.Callback()
 	local ok, result = pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 	end)
-	local v817 = ok and "Infinite Yield loaded!" or "Error: " .. tostring(result)
-
-	u328:Notify({
-		Title = "RuzHub",
-		Content = tostring(v817),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v301:Button(t36)
@@ -3907,15 +3587,6 @@ local u330 = v18
 
 function t37.Callback(p74)
 	u156(p74)
-
-	local v819 = p74 and "Anti-Fling ON" or "Anti-Fling OFF"
-
-	u330:Notify({
-		Title = "RuzHub",
-		Content = tostring(v819),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v301:Toggle(t37)
@@ -3929,15 +3600,6 @@ local u332 = v18
 
 function t38.Callback(p75)
 	u13 = p75
-
-	local v821 = p75 and "Ping Prediction ON" or "Ping Prediction OFF"
-
-	u332:Notify({
-		Title = "RuzHub",
-		Content = tostring(v821),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v301:Toggle(t38)
@@ -3950,12 +3612,6 @@ local t_lock = {
 }
 function t_lock.Callback(p_state)
     buttonLocked = p_state
-    v18:Notify({
-        Title = "RuzHub",
-        Content = p_state and "✅ Buttons Locked!" or "🔓 Buttons Unlocked!",
-        Duration = 2,
-        Icon = "lock",
-    })
 end
 v301:Toggle(t_lock)
 
@@ -3971,12 +3627,6 @@ function t39.Callback()
 		n2 = p76
 	end, function()
 		n2 = 200
-		u335:Notify({
-			Title = "RuzHub",
-			Content = tostring("Speed reset to 200"),
-			Duration = 3,
-			Icon = "bell",
-		})
 	end)
 end
 
@@ -4018,15 +3668,6 @@ function t40.Callback(p78)
 	else
 		u337()
 	end
-
-	local v824 = p78 and "ESP ON" or "ESP OFF"
-
-	u339:Notify({
-		Title = "RuzHub",
-		Content = tostring(v824),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v302:Toggle(t40)
@@ -4118,15 +3759,6 @@ function t46.Callback(p84)
 			u29 = nil
 		end
 	end
-
-	local v831 = p84 and "Gun ESP ON" or "Gun ESP OFF"
-
-	u351:Notify({
-		Title = "RuzHub",
-		Content = tostring(v831),
-		Duration = 3,
-		Icon = "bell",
-	})
 end
 
 v302:Toggle(t46)
