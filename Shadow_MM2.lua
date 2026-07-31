@@ -461,7 +461,7 @@ do
 										return t3
 									end)(CFrame.new(RootPartCFrame.Position))
 
-									Humanoid.CameraOffset = v1129:ToObjectSpace(unpack(v1130, 1, v1130.n)).Position
+									Humanoid.CameraOffset = v1129:ToObjectSpace(table.unpack(v1130, 1, v1130.n)).Position
 									u67.RunService.RenderStepped:Wait()
 
 									if RootPart and RootPart.Parent then
@@ -826,10 +826,10 @@ do
 
 							return t5
 						end
-						local v1156 = v1154(game:HttpGet(u568))
-						local v1160 = v1154(u91:JSONDecode(unpack(v1156, 1, v1156.n)))
+						local v1156 = v1154((function() local ok,res=pcall(function() return game:HttpGet(u568) end) if ok then return res else return "{}" end end)())
+						local v1160 = v1154(u91:JSONDecode(table.unpack(v1156, 1, v1156.n)))
 
-						return unpack(v1160, 1, v1160.n)
+						return table.unpack(v1160, 1, v1160.n)
 					end)
 
 					if v569 and v570 and v570.data then
@@ -1795,7 +1795,7 @@ do
 															return t14
 														end)(CFrame.new(u744))
 
-														Shoot:FireServer(cFrame, unpack(v1368, 1, v1368.n))
+														Shoot:FireServer(cFrame, table.unpack(v1368, 1, v1368.n))
 													end)
 												end)
 											end
@@ -1962,7 +1962,7 @@ do
 											return t15
 										end)(CFrame.new(u133.RootPart.Position))
 
-										u767:FireServer(cFrame, unpack(v1373, 1, v1373.n))
+										u767:FireServer(cFrame, table.unpack(v1373, 1, v1373.n))
 									end)
 								end
 
@@ -2856,7 +2856,7 @@ do
 										return t20
 									end)(CFrame.new(u888))
 
-									u876:FireServer(cFrame, unpack(v1227, 1, v1227.n))
+									u876:FireServer(cFrame, table.unpack(v1227, 1, v1227.n))
 								end)
 
 								return
@@ -2973,8 +2973,8 @@ do
 							return t21
 						end)(Vector2.new())
 
-						unpack(v1382, 1, 1)
-						u1233:ClickButton2(unpack(v1382, 1, v1382.n))
+						table.unpack(v1382, 1, 1)
+						u1233:ClickButton2(table.unpack(v1382, 1, v1382.n))
 					end)
 				end
 			end)
@@ -5697,7 +5697,7 @@ local v249 = v247:Tab({
 				return t129
 			end)(u494:AllConfigs())
 
-			u492:Refresh(unpack(v1093, 1, v1093.n))
+			u492:Refresh(table.unpack(v1093, 1, v1093.n))
 		end
 	end
 
@@ -5754,7 +5754,7 @@ local v249 = v247:Tab({
 				return t132
 			end)(u498:AllConfigs())
 
-			u492:Refresh(unpack(v1108, 1, v1108.n))
+			u492:Refresh(table.unpack(v1108, 1, v1108.n))
 		end
 
 		u54:Notify({
