@@ -2924,7 +2924,7 @@ do
 	function t2.ChatRoles()
 		local v895 = u191.FindMurderer()
 		local v896 = u191.FindSheriff()
-		local u897 = "OJ Hub >> Murderer: " .. (v895 and v895.Name or "Unknown") .. " | Sheriff: " .. (v896 and v896.Name or "Unknown")
+		local u897 = "Vision Hub >> Murderer: " .. (v895 and v895.Name or "Unknown") .. " | Sheriff: " .. (v896 and v896.Name or "Unknown")
 		local u898
 
 		if not TextChatService or TextChatService.ChatVersion ~= Enum.ChatVersion.TextChatService then
@@ -3474,8 +3474,8 @@ if v201 then
 
 									v222 = u35 and (u35:WaitForChild("PlayerGui", 10) or u35:FindFirstChildOfClass("PlayerGui"))
 									t25 = {
-										Bg = Color3.fromHex("#0F0000"),
-										Accent = Color3.fromHex("#8B0000"),
+										Bg = Color3.fromHex("#8B0000"),
+										Accent = Color3.fromHex("#FFFFFF"),
 										Transparency = 0.4,
 										HoverTransparency = 0.3,
 										PressTransparency = 0.2,
@@ -3680,7 +3680,7 @@ if v201 then
                                                                                 task.spawn(function()
                                                                                         local ok, err = pcall(p51)
                                                                                         if not ok then
-                                                                                                warn("[OJ Button Error] " .. p46 .. ": " .. tostring(err))
+                                                                                                warn("[Vision Button Error] " .. p46 .. ": " .. tostring(err))
                                                                                         end
                                                                                 end)
                                                                         end
@@ -3765,7 +3765,7 @@ if v201 then
 
 										local UIStroke = Instance.new("UIStroke")
 
-										UIStroke.Color = Color3.fromHex("#8B0000")
+										UIStroke.Color = Color3.fromHex("#FFFFFF")
 										UIStroke.Transparency = u236.StrokeTransparency
 										UIStroke.Thickness = 1
 										UIStroke.Parent = Frame
@@ -3995,6 +3995,39 @@ if v201 then
 							v247:TopbarLabel({
 								Text = "v1.8.1",
 								Color = Color3.new(1, 1, 1),
+							})
+local v249 = v247:Tab({
+								Title = "Movement",
+								Icon = "footprints",
+							})
+
+							v250 = v247:Tab({
+								Title = "Combat",
+								Icon = "swords",
+							})
+							v251 = v247:Tab({
+								Title = "Visuals",
+								Icon = "eye",
+							})
+							v252 = v247:Tab({
+								Title = "Auto Farm",
+								Icon = "circle-dollar-sign",
+							})
+							v253 = v247:Tab({
+								Title = "Teleports",
+								Icon = "map-pin",
+							})
+							v254 = v247:Tab({
+								Title = "Misc",
+								Icon = "sparkles",
+							})
+							v255 = v247:Tab({
+								Title = "GUI",
+								Icon = "list",
+							})
+							v256 = v247:Tab({
+								Title = "Settings",
+								Icon = "settings",
 							})
 							v249:Select()
 
