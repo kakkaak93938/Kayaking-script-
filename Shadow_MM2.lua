@@ -11,11 +11,11 @@ if not game:IsLoaded() then
 	end)
 end
 
-if getgenv().VisionHub_Executed and getgenv().VisionHub_Cleanup then
-	pcall(getgenv().VisionHub_Cleanup)
+if getgenv().OJHub_Executed and getgenv().OJHub_Cleanup then
+	pcall(getgenv().OJHub_Cleanup)
 end
 
-getgenv().VisionHub_Executed = true
+getgenv().OJHub_Executed = true
 
 -- FIX: unpack compatibility for Luau (MoonVeil deobfuscator bug)
 if not unpack then
@@ -203,9 +203,9 @@ do
 				end
 			end
 
-			getgenv().VisionHub_Connections = getgenv().VisionHub_Connections or {}
+			getgenv().OJHub_Connections = getgenv().OJHub_Connections or {}
 
-			for _, v in ipairs(getgenv().VisionHub_Connections) do
+			for _, v in ipairs(getgenv().OJHub_Connections) do
 				if typeof(v) == "RBXScriptConnection" and v.Connected then
 					local _pcall = pcall
 					local u49 = v
@@ -216,24 +216,24 @@ do
 				end
 			end
 
-			table.clear(getgenv().VisionHub_Connections)
+			table.clear(getgenv().OJHub_Connections)
 
 			function v50(p3)
 				if typeof(p3) ~= "RBXScriptConnection" then
 					return
 				end
 
-				local VisionHub_Connections = getgenv().VisionHub_Connections
+				local OJHub_Connections = getgenv().OJHub_Connections
 
-				table.insert(VisionHub_Connections, p3)
+				table.insert(OJHub_Connections, p3)
 
 				return p3
 			end
 			function v51(p4)
 				if p4 then
-					for i, v in ipairs(getgenv().VisionHub_Connections) do
+					for i, v in ipairs(getgenv().OJHub_Connections) do
 						if v == p4 then
-							table.remove(getgenv().VisionHub_Connections, i)
+							table.remove(getgenv().OJHub_Connections, i)
 
 							break
 						end
@@ -379,9 +379,9 @@ do
 							local connection2 = u35.CharacterAdded:Connect(v58)
 
 							if typeof(connection2) == "RBXScriptConnection" then
-								local VisionHub_Connections = getgenv().VisionHub_Connections
+								local OJHub_Connections = getgenv().OJHub_Connections
 
-								table.insert(VisionHub_Connections, connection2)
+								table.insert(OJHub_Connections, connection2)
 							end
 						end
 
@@ -394,9 +394,9 @@ do
 					end
 
 					if typeof(connection) == "RBXScriptConnection" then
-						local VisionHub_Connections = getgenv().VisionHub_Connections
+						local OJHub_Connections = getgenv().OJHub_Connections
 
-						table.insert(VisionHub_Connections, connection)
+						table.insert(OJHub_Connections, connection)
 					end
 				end
 
@@ -475,9 +475,9 @@ do
 							if typeof(connection) ~= "RBXScriptConnection" then
 								connection = nil
 							else
-								local VisionHub_Connections = getgenv().VisionHub_Connections
+								local OJHub_Connections = getgenv().OJHub_Connections
 
-								table.insert(VisionHub_Connections, connection)
+								table.insert(OJHub_Connections, connection)
 							end
 
 							u66 = connection
@@ -544,7 +544,7 @@ do
 
 						if u74.RootPart then
 							for _, child in ipairs(u74.RootPart:GetChildren()) do
-								if child.Name == "VisionFlyGyro" or child.Name == "VisionFlyVel" then
+								if child.Name == "OJFlyGyro" or child.Name == "OJFlyVel" then
 									child:Destroy()
 								end
 							end
@@ -560,7 +560,7 @@ do
 								local CurrentCamera = u76.CurrentCamera
 								local BodyGyro = Instance.new("BodyGyro")
 
-								BodyGyro.Name = "VisionFlyGyro"
+								BodyGyro.Name = "OJFlyGyro"
 								BodyGyro.P = 90000
 								BodyGyro.MaxTorque = Vector3.new(9000000000, 9000000000, 9000000000)
 								BodyGyro.CFrame = RootPart.CFrame
@@ -568,7 +568,7 @@ do
 
 								local BodyVelocity = Instance.new("BodyVelocity")
 
-								BodyVelocity.Name = "VisionFlyVel"
+								BodyVelocity.Name = "OJFlyVel"
 								BodyVelocity.Velocity = Vector3.new(0, 0, 0)
 								BodyVelocity.MaxForce = Vector3.new(9000000000, 9000000000, 9000000000)
 								BodyVelocity.Parent = RootPart
@@ -635,9 +635,9 @@ do
 								if typeof(connection) ~= "RBXScriptConnection" then
 									connection = nil
 								else
-									local VisionHub_Connections = getgenv().VisionHub_Connections
+									local OJHub_Connections = getgenv().OJHub_Connections
 
-									table.insert(VisionHub_Connections, connection)
+									table.insert(OJHub_Connections, connection)
 								end
 
 								u69 = connection
@@ -691,9 +691,9 @@ do
 					end
 
 					if typeof(connection) == "RBXScriptConnection" then
-						local VisionHub_Connections = getgenv().VisionHub_Connections
+						local OJHub_Connections = getgenv().OJHub_Connections
 
-						table.insert(VisionHub_Connections, connection)
+						table.insert(OJHub_Connections, connection)
 					end
 				end
 			end
@@ -776,8 +776,8 @@ do
 					end)
 
 					if typeof(connection) == "RBXScriptConnection" then
-						local VisionHub_Connections = getgenv().VisionHub_Connections
-						table.insert(VisionHub_Connections, connection)
+						local OJHub_Connections = getgenv().OJHub_Connections
+						table.insert(OJHub_Connections, connection)
 					end
 
 					u82 = connection
@@ -1101,22 +1101,22 @@ do
 						local Character = player.Character
 
 						if Character then
-							local VisionHighlight = Character:FindFirstChild("VisionHighlight")
+							local OJHighlight = Character:FindFirstChild("OJHighlight")
 
-							if VisionHighlight then
+							if OJHighlight then
 								local _pcall = pcall
-								local u621 = VisionHighlight
+								local u621 = OJHighlight
 
 								pcall(function()
 									u621:Destroy()
 								end)
 							end
 
-							local VisionInfoESP = Character:FindFirstChild("VisionInfoESP")
+							local OJInfoESP = Character:FindFirstChild("OJInfoESP")
 
-							if VisionInfoESP then
+							if OJInfoESP then
 								local _pcall = pcall
-								local u624 = VisionInfoESP
+								local u624 = OJInfoESP
 
 								pcall(function()
 									u624:Destroy()
@@ -1133,18 +1133,18 @@ do
 					end
 
 					if v625 then
-						local VisionGunHighlight = v625:FindFirstChild("VisionGunHighlight")
+						local OJGunHighlight = v625:FindFirstChild("OJGunHighlight")
 
-						if VisionGunHighlight then
+						if OJGunHighlight then
 							local _pcall = pcall
-							local u628 = VisionGunHighlight
+							local u628 = OJGunHighlight
 
 							pcall(function()
 								u628:Destroy()
 							end)
 						end
 
-						i = v625:FindFirstChild("VisionGunInfo")
+						i = v625:FindFirstChild("OJGunInfo")
 
 						if i then
 							pcall(function()
@@ -1256,48 +1256,48 @@ do
 								local Head = Character:FindFirstChild("Head")
 
 								if not u115.Config["Highlight" .. s1] then
-									local VisionHighlight = Character:FindFirstChild("VisionHighlight")
+									local OJHighlight = Character:FindFirstChild("OJHighlight")
 
-									if VisionHighlight then
-										VisionHighlight:Destroy()
+									if OJHighlight then
+										OJHighlight:Destroy()
 									end
 								else
-									local VisionHighlight = Character:FindFirstChild("VisionHighlight")
+									local OJHighlight = Character:FindFirstChild("OJHighlight")
 
-									if not VisionHighlight then
-										VisionHighlight = Instance.new("Highlight")
-										VisionHighlight.Name = "VisionHighlight"
-										VisionHighlight.FillTransparency = 0.85
-										VisionHighlight.OutlineTransparency = 0
-										VisionHighlight.Parent = Character
+									if not OJHighlight then
+										OJHighlight = Instance.new("Highlight")
+										OJHighlight.Name = "OJHighlight"
+										OJHighlight.FillTransparency = 0.85
+										OJHighlight.OutlineTransparency = 0
+										OJHighlight.Parent = Character
 									end
 
-									VisionHighlight.FillColor = ESPColorInnocent
-									VisionHighlight.OutlineColor = ESPColorInnocent
-									VisionHighlight.Enabled = true
+									OJHighlight.FillColor = ESPColorInnocent
+									OJHighlight.OutlineColor = ESPColorInnocent
+									OJHighlight.Enabled = true
 								end
 
 								if not u115.Config["Info" .. s1] or not Head and not HumanoidRootPart then
-									local VisionInfoESP = Character:FindFirstChild("VisionInfoESP")
+									local OJInfoESP = Character:FindFirstChild("OJInfoESP")
 
-									if VisionInfoESP then
-										VisionInfoESP:Destroy()
+									if OJInfoESP then
+										OJInfoESP:Destroy()
 									end
 
 									g666 = true
 								end
 
 								if not g666 then
-									local VisionInfoESP = Character:FindFirstChild("VisionInfoESP")
+									local OJInfoESP = Character:FindFirstChild("OJInfoESP")
 
-									if not VisionInfoESP then
-										VisionInfoESP = Instance.new("BillboardGui", Character)
-										VisionInfoESP.Name = "VisionInfoESP"
-										VisionInfoESP.Size = UDim2.fromOffset(200, 50)
-										VisionInfoESP.StudsOffset = Vector3.new(0, 3.5, 0)
-										VisionInfoESP.AlwaysOnTop = true
+									if not OJInfoESP then
+										OJInfoESP = Instance.new("BillboardGui", Character)
+										OJInfoESP.Name = "OJInfoESP"
+										OJInfoESP.Size = UDim2.fromOffset(200, 50)
+										OJInfoESP.StudsOffset = Vector3.new(0, 3.5, 0)
+										OJInfoESP.AlwaysOnTop = true
 
-										local TextLabel = Instance.new("TextLabel", VisionInfoESP)
+										local TextLabel = Instance.new("TextLabel", OJInfoESP)
 
 										TextLabel.Name = "InfoLabel"
 										TextLabel.BackgroundTransparency = 1
@@ -1308,7 +1308,7 @@ do
 										TextLabel.RichText = true
 									end
 
-									VisionInfoESP.Adornee = Head or (HumanoidRootPart or false)
+									OJInfoESP.Adornee = Head or (HumanoidRootPart or false)
 
 									repeat
 										if g669 or not HumanoidRootPart then
@@ -1332,7 +1332,7 @@ do
 
 									g671 = false
 
-									local InfoLabel = VisionInfoESP:FindFirstChild("InfoLabel")
+									local InfoLabel = OJInfoESP:FindFirstChild("InfoLabel")
 
 									if InfoLabel then
 										InfoLabel.Text = string.format("%s\n<font size='11' color='#DDDDDD'>[%d]</font>", player.Name, n2)
@@ -1364,44 +1364,44 @@ do
 					local ESPGunDropped = u115.Config.ESPGunDropped
 
 					if not ESPGunDropped then
-						local VisionGunHighlight = v677:FindFirstChild("VisionGunHighlight")
+						local OJGunHighlight = v677:FindFirstChild("OJGunHighlight")
 
-						if VisionGunHighlight then
-							VisionGunHighlight:Destroy()
+						if OJGunHighlight then
+							OJGunHighlight:Destroy()
 						end
 					else
-						local VisionGunHighlight = v677:FindFirstChild("VisionGunHighlight")
+						local OJGunHighlight = v677:FindFirstChild("OJGunHighlight")
 
-						if not VisionGunHighlight then
-							VisionGunHighlight = Instance.new("Highlight")
-							VisionGunHighlight.Name = "VisionGunHighlight"
-							VisionGunHighlight.FillTransparency = 0.4
-							VisionGunHighlight.OutlineTransparency = 0
-							VisionGunHighlight.Parent = v677
+						if not OJGunHighlight then
+							OJGunHighlight = Instance.new("Highlight")
+							OJGunHighlight.Name = "OJGunHighlight"
+							OJGunHighlight.FillTransparency = 0.4
+							OJGunHighlight.OutlineTransparency = 0
+							OJGunHighlight.Parent = v677
 						end
 
-						VisionGunHighlight.FillColor = Color3.fromRGB(0, 255, 255)
-						VisionGunHighlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-						VisionGunHighlight.Enabled = true
+						OJGunHighlight.FillColor = Color3.fromRGB(0, 255, 255)
+						OJGunHighlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+						OJGunHighlight.Enabled = true
 					end
 
 					if not ESPGunDropped then
-						local VisionGunInfo = v677:FindFirstChild("VisionGunInfo")
+						local OJGunInfo = v677:FindFirstChild("OJGunInfo")
 
-						if VisionGunInfo then
-							VisionGunInfo:Destroy()
+						if OJGunInfo then
+							OJGunInfo:Destroy()
 						end
 					else
-						local VisionGunInfo = v677:FindFirstChild("VisionGunInfo")
+						local OJGunInfo = v677:FindFirstChild("OJGunInfo")
 
-						if not VisionGunInfo then
-							VisionGunInfo = Instance.new("BillboardGui", v677)
-							VisionGunInfo.Name = "VisionGunInfo"
-							VisionGunInfo.Size = UDim2.fromOffset(100, 40)
-							VisionGunInfo.StudsOffset = Vector3.new(0, 2, 0)
-							VisionGunInfo.AlwaysOnTop = true
+						if not OJGunInfo then
+							OJGunInfo = Instance.new("BillboardGui", v677)
+							OJGunInfo.Name = "OJGunInfo"
+							OJGunInfo.Size = UDim2.fromOffset(100, 40)
+							OJGunInfo.StudsOffset = Vector3.new(0, 2, 0)
+							OJGunInfo.AlwaysOnTop = true
 
-							local TextLabel = Instance.new("TextLabel", VisionGunInfo)
+							local TextLabel = Instance.new("TextLabel", OJGunInfo)
 
 							TextLabel.BackgroundTransparency = 1
 							TextLabel.Size = UDim2.fromScale(1, 1)
@@ -1414,7 +1414,7 @@ do
 
 						local Magnitude = (u118.CFrame.Position - v677.Position).Magnitude
 						local v685 = math.floor(Magnitude)
-						local TextLabel = VisionGunInfo:FindFirstChildOfClass("TextLabel")
+						local TextLabel = OJGunInfo:FindFirstChildOfClass("TextLabel")
 
 						if TextLabel then
 							TextLabel.Text = string.format("<b>GUN</b>\n<font size='13' color='#DDDDDD'>[%d]</font>", v685)
@@ -1437,9 +1437,9 @@ do
 			end)
 
 			if typeof(connection) == "RBXScriptConnection" then
-				local VisionHub_Connections = getgenv().VisionHub_Connections
+				local OJHub_Connections = getgenv().OJHub_Connections
 
-				table.insert(VisionHub_Connections, connection)
+				table.insert(OJHub_Connections, connection)
 			end
 
 			local PlayerRemoving = t2.Players.PlayerRemoving
@@ -1615,14 +1615,14 @@ do
 
 						local BodyVelocity = Instance.new("BodyVelocity")
 
-						BodyVelocity.Name = "VisionHub_FlingVelocity"
+						BodyVelocity.Name = "OJHub_FlingVelocity"
 						BodyVelocity.Parent = v697
 						BodyVelocity.Velocity = Vector3.new(10000, 10000, 10000)
 						BodyVelocity.MaxForce = Vector3.new(1e999, 1e999, 1e999)
 
 						local BodyAngularVelocity = Instance.new("BodyAngularVelocity")
 
-						BodyAngularVelocity.Name = "VisionHub_SpinVelocity"
+						BodyAngularVelocity.Name = "OJHub_SpinVelocity"
 						BodyAngularVelocity.Parent = v697
 						BodyAngularVelocity.AngularVelocity = Vector3.new(10000, 10000, 10000)
 						BodyAngularVelocity.MaxTorque = Vector3.new(1e999, 1e999, 1e999)
@@ -2128,9 +2128,9 @@ do
 							if typeof(connection) ~= "RBXScriptConnection" then
 								connection = nil
 							else
-								local VisionHub_Connections = getgenv().VisionHub_Connections
+								local OJHub_Connections = getgenv().OJHub_Connections
 
-								table.insert(VisionHub_Connections, connection)
+								table.insert(OJHub_Connections, connection)
 							end
 
 							u138 = connection
@@ -2177,9 +2177,9 @@ do
 				if typeof(connection) ~= "RBXScriptConnection" then
 					connection = nil
 				else
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 
 				u141 = connection
@@ -2229,9 +2229,9 @@ do
 				if typeof(connection) ~= "RBXScriptConnection" then
 					connection = nil
 				else
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 
 				u146 = connection
@@ -2305,9 +2305,9 @@ do
 				if typeof(connection) ~= "RBXScriptConnection" then
 					connection = nil
 				else
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 
 				u151 = connection
@@ -2343,9 +2343,9 @@ do
 				if typeof(connection) ~= "RBXScriptConnection" then
 					connection = nil
 				else
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 
 				u156 = connection
@@ -2679,9 +2679,9 @@ do
 				if typeof(connection) ~= "RBXScriptConnection" then
 					connection = nil
 				else
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 
 				u167 = connection
@@ -2924,7 +2924,7 @@ do
 	function t2.ChatRoles()
 		local v895 = u191.FindMurderer()
 		local v896 = u191.FindSheriff()
-		local u897 = "Vision Hub >> Murderer: " .. (v895 and v895.Name or "Unknown") .. " | Sheriff: " .. (v896 and v896.Name or "Unknown")
+		local u897 = "OJ Hub >> Murderer: " .. (v895 and v895.Name or "Unknown") .. " | Sheriff: " .. (v896 and v896.Name or "Unknown")
 		local u898
 
 		if not TextChatService or TextChatService.ChatVersion ~= Enum.ChatVersion.TextChatService then
@@ -3001,7 +3001,7 @@ do
 
 		if p41 then
 			u197 = Instance.new("ScreenGui")
-			u197.Name = "VisionTimerGUI"
+			u197.Name = "OJTimerGUI"
 			u197.ResetOnSpawn = false
 			u197.IgnoreGuiInset = true
 			u197.Parent = CoreGui or u35 and u35:FindFirstChildOfClass("PlayerGui")
@@ -3155,9 +3155,9 @@ if v201 then
 														end)
 
 														if typeof(connection) == "RBXScriptConnection" then
-															local VisionHub_Connections = getgenv().VisionHub_Connections
+															local OJHub_Connections = getgenv().OJHub_Connections
 
-															table.insert(VisionHub_Connections, connection)
+															table.insert(OJHub_Connections, connection)
 														end
 													end
 												end
@@ -3175,9 +3175,9 @@ if v201 then
 												end)
 
 												if typeof(connection) == "RBXScriptConnection" then
-													local VisionHub_Connections = getgenv().VisionHub_Connections
+													local OJHub_Connections = getgenv().OJHub_Connections
 
-													table.insert(VisionHub_Connections, connection)
+													table.insert(OJHub_Connections, connection)
 												end
 
 												if u210.Player.Character then
@@ -3474,8 +3474,8 @@ if v201 then
 
 									v222 = u35 and (u35:WaitForChild("PlayerGui", 10) or u35:FindFirstChildOfClass("PlayerGui"))
 									t25 = {
-										Bg = Color3.fromHex("#0B0E14"),
-										Accent = Color3.fromHex("#FFFFFF"),
+										Bg = Color3.fromHex("#0F0000"),
+										Accent = Color3.fromHex("#8B0000"),
 										Transparency = 0.4,
 										HoverTransparency = 0.3,
 										PressTransparency = 0.2,
@@ -3504,7 +3504,7 @@ if v201 then
 											local t26 = {}
 
 											if readfile then
-												local ok, result = pcall(readfile, "Vision_Buttons.json")
+												local ok, result = pcall(readfile, "OJ_Buttons.json")
 
 												if ok and result then
 													local _pcall = pcall
@@ -3533,7 +3533,7 @@ if v201 then
 
 											t27.size = math.round(XOffset)
 											t26[p44] = t27
-											pcall(writefile, "Vision_Buttons.json", u225:JSONEncode(t26))
+											pcall(writefile, "OJ_Buttons.json", u225:JSONEncode(t26))
 
 											return
 										end
@@ -3680,7 +3680,7 @@ if v201 then
                                                                                 task.spawn(function()
                                                                                         local ok, err = pcall(p51)
                                                                                         if not ok then
-                                                                                                warn("[Vision Button Error] " .. p46 .. ": " .. tostring(err))
+                                                                                                warn("[OJ Button Error] " .. p46 .. ": " .. tostring(err))
                                                                                         end
                                                                                 end)
                                                                         end
@@ -3712,7 +3712,7 @@ if v201 then
 										local t30 = {}
 
 										if readfile then
-											local ok, result = pcall(readfile, "Vision_Buttons.json")
+											local ok, result = pcall(readfile, "OJ_Buttons.json")
 
 											if ok and result then
 												local _pcall = pcall
@@ -3765,7 +3765,7 @@ if v201 then
 
 										local UIStroke = Instance.new("UIStroke")
 
-										UIStroke.Color = Color3.fromHex("#00BFFF")
+										UIStroke.Color = Color3.fromHex("#8B0000")
 										UIStroke.Transparency = u236.StrokeTransparency
 										UIStroke.Thickness = 1
 										UIStroke.Parent = Frame
@@ -3875,8 +3875,8 @@ if v201 then
 															Icon = "rbxthumb://type=AvatarHeadShot&id=" .. v1316.UserId .. "&w=150&h=150",
 															IconSize = 45,
 															Duration = 8,
-															TitleColor = Color3.fromHex("#00BFFF"),
-															ProgressBarColor = Color3.fromHex("#00BFFF"),
+															TitleColor = Color3.fromHex("#8B0000"),
+															ProgressBarColor = Color3.fromHex("#8B0000"),
 														})
 													end
 												end
@@ -3930,10 +3930,10 @@ if v201 then
 																Content = "The Sheriff has died. The gun is now available for pickup!",
 																Icon = "crosshair",
 																Duration = 5,
-																TitleColor = Color3.fromHex("#00BFFF"),
-																IconColor = Color3.fromHex("#00BFFF"),
+																TitleColor = Color3.fromHex("#8B0000"),
+																IconColor = Color3.fromHex("#8B0000"),
 																BackgroundColor = Color3.fromHex("#030407"),
-																ProgressBarColor = Color3.fromHex("#00BFFF"),
+																ProgressBarColor = Color3.fromHex("#8B0000"),
 															})
 
 															return
@@ -3948,8 +3948,8 @@ if v201 then
 								end
 							end
 
-							getgenv().VisionHub_Cleanup = function()
-								for _, v in ipairs(getgenv().VisionHub_Connections) do
+							getgenv().OJHub_Cleanup = function()
+								for _, v in ipairs(getgenv().OJHub_Connections) do
 									if typeof(v) == "RBXScriptConnection" and v.Connected then
 										local _pcall = pcall
 										local u988 = v
@@ -3960,13 +3960,13 @@ if v201 then
 									end
 								end
 
-								table.clear(getgenv().VisionHub_Connections)
+								table.clear(getgenv().OJHub_Connections)
 								getgenv().ClearESP()
 							end
 							v247 = u54:CreateWindow({
-								Title = "VISION <font color='#00BFFF'>HUB</font>",
+								Title = "OJ <font color='#8B0000'>HUB</font>",
 								Author = "by orialdev",
-								Folder = "VisionHub",
+								Folder = "OJHub",
 								Resizable = true,
 								Minimizable = true,
 								Theme = "Midnight",
@@ -3975,13 +3975,13 @@ if v201 then
 								SideBarWidth = 180,
 								CornerRadius = UDim.new(0, 12),
 								OpenButton = {
-									Title = "VISION <font color='#00BFFF'>HUB</font>",
+									Title = "OJ <font color='#8B0000'>HUB</font>",
 									CornerRadius = UDim.new(0, 10),
 									StrokeThickness = 2,
 									Enabled = true,
 									Draggable = true,
 									OnlyMobile = true,
-									Color = ColorSequence.new(Color3.fromHex("#00BFFF"), Color3.fromHex("#89F7FF")),
+									Color = ColorSequence.new(Color3.fromHex("#8B0000"), Color3.fromHex("#89F7FF")),
 									GradientEnabled = true,
 								},
 							})
@@ -3996,222 +3996,7 @@ if v201 then
 								Text = "v1.8.1",
 								Color = Color3.new(1, 1, 1),
 							})
-
-							local v248 = v247:Tab({
-								Title = "Home",
-								Icon = "house",
-							})
-							local v249 = v247:Tab({
-								Title = "Movement",
-								Icon = "footprints",
-							})
-
-							v250 = v247:Tab({
-								Title = "Combat",
-								Icon = "swords",
-							})
-							v251 = v247:Tab({
-								Title = "Visuals",
-								Icon = "eye",
-							})
-							v252 = v247:Tab({
-								Title = "Auto Farm",
-								Icon = "circle-dollar-sign",
-							})
-							v253 = v247:Tab({
-								Title = "Teleports",
-								Icon = "map-pin",
-							})
-							v254 = v247:Tab({
-								Title = "Misc",
-								Icon = "sparkles",
-							})
-							v255 = v247:Tab({
-								Title = "GUI",
-								Icon = "list",
-							})
-							v256 = v247:Tab({
-								Title = "Settings",
-								Icon = "settings",
-							})
-							v248:Select()
-
-							local s3 = "<font color='#FF0000'>✖ FREE USER</font>"
-
-							if t2.IsPremium then
-								s3 = "<font color='#FFFF00'>★ Premium</font>"
-							end
-
-							local t31 = {
-								Title = "Hello, " .. (u35 and u35.Name or "User") .. "!",
-							}
-							local format = string.format
-							local s4
-
-							if typeof(identifyexecutor) ~= "function" then
-								s4 = "Unknown Executor"
-							else
-								s4 = identifyexecutor()
-							end
-
-							t31.Desc = format(
-								"<font color='#AAAAAA'>Executor:</font> %s\n<font color='#AAAAAA'>Account Age:</font> %d days\n<font color='#AAAAAA'>User ID:</font> %d\n<font color='#AAAAAA'>Status:</font> %s",
-								s4,
-								u35 and u35.AccountAge or 0,
-								u35 and u35.UserId or 0,
-								s3
-							)
-							t31.RichText = true
-							t31.Image = "rbxthumb://type=AvatarHeadShot&id=" .. (u35 and u35.UserId or 0) .. "&w=150&h=150"
-							t31.ImageSize = 60
-							v248:Paragraph(t31)
-							v248:Divider()
-
-							local v262 = v248:Paragraph({
-								Title = "Game State: <font color='#FFA500'>Scanning...</font>",
-								Desc = "Waiting for game data...",
-								Icon = "radar",
-								RichText = true,
-							})
-							local spawn = task.spawn
-							local u264 = ReplicatedStorage
-							local u265 = t2
-							local u266 = v262
-
-							spawn(function()
-								while task.wait(1) do
-									pcall(function()
-										local s5 = "Intermission"
-										local ok, result = pcall(function()
-											local Remotes = u264:FindFirstChild("Remotes")
-											local v1404 = Remotes and Remotes:FindFirstChild("Extras")
-											local v1405 = v1404 and v1404:FindFirstChild("GetTimer")
-
-											if not v1405 then
-												error("Remote not found")
-
-												return
-											end
-
-											return v1405:InvokeServer()
-										end)
-										local v1322 = false
-
-										if ok and (typeof(result) == "number" and result > 0) then
-											local v1323 = result / 60
-											local v1324 = math.floor(v1323)
-											local v1325 = result % 60
-
-											s5 = string.format("%02d:%02d", v1324, v1325)
-											v1322 = true
-										end
-
-										local v1326 = u265.FindMurderer()
-										local v1327 = u265.FindSheriff()
-
-										if v1326 then
-											v1327 = "<font color='#FF0000'>" .. v1326.Name .. "</font>"
-										end
-
-										if v1327 then
-											local _ = "<font color='#0000FF'>" .. v1327.Name .. "</font>"
-										end
-
-										local v1329 = v1322 and "<font color='#55FF55'>In Progress</font>" or "<font color='#AAAAAA'>Intermission</font>"
-
-										u266:SetTitle("Game State: " .. v1329)
-										u266:SetDesc("<b>Timer:</b> " .. s5 .. "\n<b>Murderer:</b> -\n<b>Sheriff:</b> -")
-									end)
-								end
-							end)
-							v248:Divider()
-							v248:Paragraph({
-								Title = "⭐ VISION HUB PREMIUM – (150 ROBUX) ⭐",
-								Desc = table.concat({
-									"Unlock the most powerful & discreet features!",
-									"",
-									"• God Mode",
-									"• Invisibility",
-									"• Wall Bang",
-									"• Silent Kill All Mode",
-									"• Silent Knife Aura Mode",
-									"",
-									"How to unlock:",
-									"Buy the VIP Gamepass and send VIDEO PROOF in the Discord",
-									"with your EXACT username!",
-								}, "\n"),
-								Thumbnail = "https://raw.githubusercontent.com/orialthesexydev/VisionHub/refs/heads/main/premium_image.png",
-								ThumbnailSize = 200,
-								Buttons = {
-									{
-										Title = "Copy Gamepass Link",
-										Icon = "shopping-cart",
-										Callback = function()
-											if setclipboard then
-												setclipboard("https://www.roblox.com/game-pass/1637985884/Vision-Hub-Premium-Access")
-											end
-
-											u54:Notify({
-												Title = "Link Copied",
-												Content = "Premium Gamepass link copied to clipboard!",
-												Icon = "check",
-											})
-										end,
-									},
-								},
-							})
-							v248:Divider()
-
-							local t32 = {
-								Title = "Our Community!",
-								Desc = "Join our Discord for support, updates, and giveaways.",
-								Image = "https://raw.githubusercontent.com/orialthesexydev/VisionHub/refs/heads/main/Vision.png",
-								ImageSize = 100,
-								Icon = "message-circle",
-							}
-							local t33 = {}
-							local t34 = {
-								Title = "Copy Invite",
-								Icon = "copy",
-							}
-							local u270 = v247
-
-							function t34.Callback()
-								if setclipboard then
-									setclipboard("https://discord.gg/B3dEqP2EX6")
-									u270:Dialog({
-										Title = "Discord Link Copied",
-										Icon = "geist:logo-discord",
-										Content = "The Discord invite link has been copied to your clipboard.",
-										Buttons = {
-											{
-												Title = "OK",
-												Icon = "check",
-											},
-										},
-									})
-								end
-							end
-
-							t33[1] = t34
-							t32.Buttons = t33
-							v248:Paragraph(t32)
-							v248:Divider()
-
-							local v271 = v248:Group()
-
-							v271:Paragraph({
-								Title = string.format("%s <font size='12' color='#888888'>(@%s)</font>", "Orial_Dev", "1764299453"),
-								Desc = "Founder of Vision Hub",
-								Thumbnail = "rbxthumb://type=AvatarHeadShot&id=1764299453&w=150&h=150",
-								RichText = true,
-							})
-							v271:Paragraph({
-								Title = string.format("%s <font size='12' color='#888888'>(@%s)</font>", "1Ytb_zenyx", "5113773161"),
-								Desc = "Support Developer",
-								Thumbnail = "rbxthumb://type=AvatarHeadShot&id=5113773161&w=150&h=150",
-								RichText = true,
-							})
+							v249:Select()
 
 							local v272 = v249:Section({
 								Title = "Movement Features",
@@ -4996,18 +4781,18 @@ if v201 then
 					local connection = Players.PlayerAdded:Connect(v378)
 
 					if typeof(connection) == "RBXScriptConnection" then
-						local VisionHub_Connections = getgenv().VisionHub_Connections
+						local OJHub_Connections = getgenv().OJHub_Connections
 
-						table.insert(VisionHub_Connections, connection)
+						table.insert(OJHub_Connections, connection)
 					end
 				end
 
 				local connection = Players.PlayerRemoving:Connect(v378)
 
 				if typeof(connection) == "RBXScriptConnection" then
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 			end
 
@@ -5139,18 +4924,18 @@ if v201 then
 					local connection = Players.PlayerAdded:Connect(v402)
 
 					if typeof(connection) == "RBXScriptConnection" then
-						local VisionHub_Connections = getgenv().VisionHub_Connections
+						local OJHub_Connections = getgenv().OJHub_Connections
 
-						table.insert(VisionHub_Connections, connection)
+						table.insert(OJHub_Connections, connection)
 					end
 				end
 
 				local connection = Players.PlayerRemoving:Connect(v402)
 
 				if typeof(connection) == "RBXScriptConnection" then
-					local VisionHub_Connections = getgenv().VisionHub_Connections
+					local OJHub_Connections = getgenv().OJHub_Connections
 
-					table.insert(VisionHub_Connections, connection)
+					table.insert(OJHub_Connections, connection)
 				end
 			end
 
